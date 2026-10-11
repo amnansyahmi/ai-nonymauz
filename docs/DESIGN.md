@@ -1,30 +1,23 @@
-# AI-Nonymauz landing page
+# AI-Nonymauz product experience
 
-## Purpose
+## Direction
 
-Introduce the owner's family of systems and help visitors choose a product by the job they need to do. The catalogue links to verified repository homepage destinations; SecureIntelligence points to its developer repository. It does not promise shared accounts, automatic data sync, fixed pricing, or unconfigured AI capabilities.
+Warm white, navy, and blue; Archivo for the interface and system serif italics for occasional emphasis. The composition uses a sculpted ribbon mark, an open product directory, alternating large demo showcases, and a quiet closing section. Each product has an accent colour and an individual detail page.
 
-## Design direction
+The visitor progression is introduction → switchable sample workspace → system directory → three playable workflows → wedding planning → shared design principles → FAQ → system finder/project brief.
 
-Cool white and navy, with a blue workspace stage as the main visual moment. A restrained header, left-aligned hero copy, and a hands-on product preview lead into the catalogue. Featured products have horizontal compositions; smaller systems use compact visual previews. These are explicitly illustrative UI samples with fictional records, not screenshots of production data.
+## Seven improvements
 
-Palette: paper `#FFFFFF`, ink `#18293B`, muted `#526376`, action blue `#214DD7`, wash `#F7F9FC`, navy `#152C46`. Each product has a quiet category-specific accent. Archivo is self-hosted under its SIL Open Font License; one variable family carries the entire type hierarchy.
+1. **3D hero:** bevelled ribbon geometry forming an n. mark, rendered using local WebGL shaders. Diffuse/specular lighting, a soft CSS ground shadow, gentle movement, mouse response, and product palette interpolation. An inline SVG remains visible if WebGL is unavailable or the context is lost. The renderer loads after content, caps pixel density and frame rate, and suspends offscreen, behind dialogs, in hidden tabs, or when motion is paused/reduced.
+2. **Playable demos:** approve requests and update pending counts; enter validated expenses and recalculate the budget; move project tasks using buttons or dragging. Each demo owns independent state. Hero tab changes preserve its existing state; Reset and reload restore sample data.
+3. **Scroll presentation:** the hero workspace straightens as it enters view, and the larger demo scenes settle into position. Native page scrolling is preserved; no scroll lock or forced scene progression. Small screens and reduced-motion preferences use static transforms.
+4. **Composition:** readable typography and deliberate spacing; a compact product directory replaces the repeated catalogue cards; product workflows have larger individual showcases.
+5. **Product pages:** seven static pages with useful descriptions, a three-step walkthrough, interactive illustrations, app destinations, availability notes, and related products. The People page includes real repository screenshots of a demo workspace. Other pages show explicitly illustrative mobile workspaces, not invented screenshots.
+6. **System finder:** goal-based routing covering all seven products, a plain-language reason, relevant features, and back navigation. It uses local rules, not an AI request.
+7. **Mobile:** responsive demo layouts, stacked Kanban stages, touch controls, 16px expense inputs to avoid input-focus zoom, bottom-sheet dialogs, fixed-body background scroll locking, native focus containment, Escape/close/backdrop dismissal, and optional handle swipe dismissal. Pinch zoom remains available for accessibility.
 
-UI/UX Pro Max was consulted using the query `software portfolio product showcase minimal` and its design-system and accessibility guidance. Its automatic brutalism/storytelling recommendation was reviewed and adapted: raw anti-design and scroll-driven storytelling do not fit a straightforward system directory. The final treatment keeps a coherent palette and typography while favouring readable product discovery and familiar interaction patterns.
+## Integrity and accessibility
 
-The [Frontend Design skill](https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md) guided the distinctive product-first visual direction, restrained motion, copy, and hierarchy. A single page-load animation introduces the hero; other movement follows user actions. SVG iconography is drawn locally; no emojis or external icon runtime is needed.
+No invented customers, testimonials, adoption metrics, shared-account claims, prices, or cross-product integrations. All interactive demonstrations are labelled; cloud replies are scripted and security steps are illustrative. Product descriptions retain configuration/availability notes. The brief is downloaded locally, never submitted.
 
-## Interactions
-
-- Three hero previews switch on explicit user input; no automatic carousel.
-- Catalogue filters expose their pressed state and announce result counts.
-- Product details use native modal dialogs with scroll locking, Escape dismissal, focus restoration, and deep links such as `?system=people`.
-- Mobile navigation exposes expanded state and closes after navigation.
-- Native disclosure controls handle FAQs.
-- A project brief downloads locally as Markdown. It validates the goal and audience and never submits or stores personal data.
-
-## Implementation
-
-The background uses perspective-projected 3D geometry: a rotating wireframe globe and translucent cube in the hero, and torus meshes around the brand marks. The locally drawn canvas scenes run at up to 30 frames per second, cap pixel density, and use fewer vertices on small screens. A visible pause control stops all scenes. Reduced-motion renders a static composition; offscreen scenes, hidden tabs, and open dialogs suspend the animation loop. Existing SVG/CSS circles remain as fallbacks if canvas is unavailable.
-
-Dependency-free HTML, CSS, and ES modules; Node 22+ for the local server and static build. No database or AI secrets belong in the landing page. Production assets are served from the same origin, including the typeface. Vercel headers restrict script/style/connect sources and frame embedding.
+Semantic landmarks, one H1 per page, native links/buttons, wrapped input labels, live status messages, visible keyboard focus, and keyboard alternatives to dragging. The mobile menu and all toggles expose state. Motion is optional, and essential content never depends on the canvas or scroll animations.
