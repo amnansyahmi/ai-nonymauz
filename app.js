@@ -1,4 +1,5 @@
 import { products } from './products.js';
+import './background.js';
 
 const paths = {
   'arrow-right': '<path d="M4 12h16m-6-6 6 6-6 6"/>',

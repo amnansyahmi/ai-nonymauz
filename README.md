@@ -24,6 +24,7 @@ The build copies the static site into `dist/`. Vercel automatically reads the bu
 
 - Responsive product catalogue with Work & business, Everyday life, and AI & development filters.
 - Interactive People, KretivOS, and FlowTrack UI previews with fictional sample records.
+- Lightweight 3D background geometry with a pause control, reduced-motion support, and rendering suspended off screen, in hidden tabs, or behind dialogs.
 - Product detail dialogs, verified app/repository destinations, and shareable `?system=people` links.
 - Accessible mobile navigation, FAQ disclosures, and reduced-motion support.
 - Browser-local project brief generation and Markdown download; no form submission or data storage.

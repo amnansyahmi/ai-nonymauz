@@ -25,4 +25,6 @@ The [Frontend Design skill](https://github.com/anthropics/skills/blob/main/skill
 
 ## Implementation
 
+The background uses perspective-projected 3D geometry: a rotating wireframe globe and translucent cube in the hero, and torus meshes around the brand marks. The locally drawn canvas scenes run at up to 30 frames per second, cap pixel density, and use fewer vertices on small screens. A visible pause control stops all scenes. Reduced-motion renders a static composition; offscreen scenes, hidden tabs, and open dialogs suspend the animation loop. Existing SVG/CSS circles remain as fallbacks if canvas is unavailable.
+
 Dependency-free HTML, CSS, and ES modules; Node 22+ for the local server and static build. No database or AI secrets belong in the landing page. Production assets are served from the same origin, including the typeface. Vercel headers restrict script/style/connect sources and frame embedding.

@@ -19,6 +19,10 @@ Verified locally on 11 October 2026 using Node.js 24 and Chromium via Playwright
 
 ## Visual review
 
+### 3D background update — 12 October 2026
+
+The hero globe/cube and brand torus backgrounds were checked in Chromium on desktop and phone. Canvas pixel snapshots confirm the geometry changes over time, pauses and resumes through the visible control, freezes for reduced-motion preferences, and suspends while a dialog is open or the scene is off screen. Returning to the scene resumes rendering. The original six responsive widths and complete interaction checks still pass, with no page errors or failed local assets. See the [updated hero](screenshots/3d-hero.webp).
+
 Reviewed [desktop](screenshots/desktop.webp), [phone](screenshots/mobile.webp), and [phone dialog](screenshots/mobile-dialog.webp) screenshots. An overflow caused by a decorative orbit was fixed, and featured product artwork now fills its allocated height.
 
 ## Boundaries
