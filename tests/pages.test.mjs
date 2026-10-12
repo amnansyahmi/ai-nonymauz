@@ -3,6 +3,15 @@ import assert from "node:assert/strict";
 import { readFile, stat } from "node:fs/promises";
 import { products, productPages, productPath } from "../products.js";
 const routes = ["/", ...products.map((p) => productPath(p.id))];
+test("production renderer resolves locally without CDN or bare package imports", async () => {
+  const { logoGeometry, startRibbon } = await import("../dist/background.js");
+  assert.equal(typeof startRibbon, "function");
+  const geometry = logoGeometry();
+  assert.ok(geometry.getAttribute("position").count > 0);
+  geometry.dispose();
+  const html = await readFile("dist/index.html", "utf8");
+  assert.ok(html.includes('src="/assets/logo-sculpture.svg"'));
+});
 for (const route of routes)
   test(`generated page ${route} has valid local destinations and unique landmarks`, async () => {
     const html = await readFile(`dist${route}index.html`, "utf8");

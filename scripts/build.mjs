@@ -2,17 +2,23 @@ import { cp, mkdir, rm, readFile, writeFile } from "node:fs/promises";
 import { products, productPages, productPath } from "../products.js";
 import { header, footer, dialogs, home, productPage } from "../lib/pages.js";
 import { escapeHTML } from "../lib/ui.js";
+import { build } from "esbuild";
 await rm("dist", { recursive: true, force: true });
 await mkdir("dist", { recursive: true });
 for (const file of [
   "styles.css",
   "app.js",
   "products.js",
-  "background.js",
   "assets",
   "lib",
 ])
   await cp(file, `dist/${file}`, { recursive: true });
+// Lazy-loaded, bundled locally: no CDN or bare imports in the browser.
+await build({
+  entryPoints: ["background.js"], outfile: "dist/background.js",
+  bundle: true, format: "esm", minify: true, target: "es2022",
+  legalComments: "linked",
+});
 const template = await readFile("index.html", "utf8");
 const render = (main, title, description, path) =>
   template.replace(
