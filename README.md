@@ -20,11 +20,11 @@ npm test
 npm start
 ```
 
-Vercel uses the static build settings in `vercel.json`. All runtime assets, including the font and 3D renderer, are served locally. Linkedom is a development-only dependency used for DOM interaction tests; the browser runtime has no package dependencies.
+Vercel uses the static build settings in `vercel.json`. All runtime assets, including the font and Three.js renderer, are served locally. esbuild bundles the lazy-loaded renderer into `dist/background.js`; there are no CDN requests. Linkedom is a development-only dependency used for DOM interaction tests.
 
 ## Experience
 
-- A bevelled 3D ribbon monogram with lighting, product colour changes, subtle pointer response, static SVG fallback, and shared motion controls.
+- A slowly spinning, bevelled 3D N brand monogram with lighting, product colour changes, subtle pointer response, static SVG fallback, and shared motion controls.
 - Three switchable hero demos with preserved local state, plus full-size People, FlowTrack, and KretivOS showcases.
 - Working approvals, validated expense entry and budget recalculation, and task movement via buttons or drag and drop. All use fictional demo data.
 - Smaller interactive concepts for Restu.ai, PowerOS, AI Cloud, and SecureIntelligence. AI replies are explicitly scripted, and the security demo does not scan anything.
@@ -41,7 +41,7 @@ Vercel uses the static build settings in `vercel.json`. All runtime assets, incl
 - `lib/pages.js` and `index.html`: static page templates.
 - `lib/demo-views.js`, `lib/demos.js`, `lib/demo-state.js`: demo markup, interactions, validated state helpers.
 - `app.js`: navigation, system finder, dialogs, previews, motion coordination, brief download.
-- `background.js`: self-contained WebGL renderer and geometry.
+- `background.js`: Three.js scene, extruded brand geometry, and renderer lifecycle.
 - `styles.css`: responsive styles and design tokens.
 - `scripts/build.mjs`: static pages, metadata, sitemap, assets.
 - `tests/`: state, DOM interaction, geometry, and generated-page checks.

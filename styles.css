@@ -389,12 +389,33 @@ p {
   height: 100%;
   pointer-events: none;
 }
-.ribbon-fallback svg {
+.ribbon-fallback img {
   width: 100%;
   height: 100%;
+  object-fit: contain;
+  animation: logo-turn 24s linear infinite;
+}
+#ribbon-canvas {
+  opacity: 0;
+}
+.webgl-ready #ribbon-canvas {
+  opacity: 1;
 }
 .webgl-ready .ribbon-fallback {
   visibility: hidden;
+}
+.logo-idle .ribbon-fallback img {
+  animation-play-state: paused;
+}
+.hero-art[data-tone="flow"] .ribbon-fallback img {
+  filter: hue-rotate(285deg) saturate(.65);
+}
+.hero-art[data-tone="kretiv"] .ribbon-fallback img {
+  filter: hue-rotate(35deg) saturate(.7);
+}
+@keyframes logo-turn {
+  from { transform: perspective(900px) rotateY(-18deg); }
+  to { transform: perspective(900px) rotateY(342deg); }
 }
 .art-caption {
   position: absolute;

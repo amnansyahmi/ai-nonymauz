@@ -2,13 +2,13 @@
 
 ## Direction
 
-Warm white, navy, and blue; Archivo for the interface and system serif italics for occasional emphasis. The composition uses a sculpted ribbon mark, an open product directory, alternating large demo showcases, and a quiet closing section. Each product has an accent colour and an individual detail page.
+Warm white, navy, and blue; Archivo for the interface and system serif italics for occasional emphasis. The composition uses a sculpted N brand mark, an open product directory, alternating large demo showcases, and a quiet closing section. Each product has an accent colour and an individual detail page.
 
 The visitor progression is introduction → switchable sample workspace → system directory → three playable workflows → wedding planning → shared design principles → FAQ → system finder/project brief.
 
 ## Seven improvements
 
-1. **3D hero:** bevelled ribbon geometry forming an n. mark, rendered using local WebGL shaders. Diffuse/specular lighting, a soft CSS ground shadow, gentle movement, mouse response, and product palette interpolation. An inline SVG remains visible if WebGL is unavailable or the context is lost. The renderer loads after content, caps pixel density and frame rate, and suspends offscreen, behind dialogs, in hidden tabs, or when motion is paused/reduced.
+1. **3D hero:** the navigation's N + crossbar brand mark extruded as one bevelled piece in Three.js. Studio lighting, a soft CSS ground shadow, a full turn every 24 seconds, mouse tilt, and product palette interpolation. A matching local SVG rotates with CSS when WebGL is unavailable; it remains visible until a healthy frame draws triangles and returns after rendering failure or context loss. Context restoration rebuilds the scene; page exit disposes GPU resources and listeners. The renderer loads after content, caps pixel density and frame rate, and suspends offscreen, behind dialogs, in hidden tabs, or when motion is paused/reduced. Three.js is bundled locally using esbuild.
 2. **Playable demos:** approve requests and update pending counts; enter validated expenses and recalculate the budget; move project tasks using buttons or dragging. Each demo owns independent state. Hero tab changes preserve its existing state; Reset and reload restore sample data.
 3. **Scroll presentation:** the hero workspace straightens as it enters view, and the larger demo scenes settle into position. Native page scrolling is preserved; no scroll lock or forced scene progression. Small screens and reduced-motion preferences use static transforms.
 4. **Composition:** readable typography and deliberate spacing; a compact product directory replaces the repeated catalogue cards; product workflows have larger individual showcases.
@@ -21,3 +21,13 @@ The visitor progression is introduction → switchable sample workspace → syst
 No invented customers, testimonials, adoption metrics, shared-account claims, prices, or cross-product integrations. All interactive demonstrations are labelled; cloud replies are scripted and security steps are illustrative. Product descriptions retain configuration/availability notes. The brief is downloaded locally, never submitted.
 
 Semantic landmarks, one H1 per page, native links/buttons, wrapped input labels, live status messages, visible keyboard focus, and keyboard alternatives to dragging. The mobile menu and all toggles expose state. Motion is optional, and essential content never depends on the canvas or scroll animations.
+
+
+## Animation library choices
+
+- **Three.js (implemented):** camera/matrix handling, bevelled geometry, lighting, and WebGL context restoration for the spinning logo. R3F is a React renderer; this site uses plain JavaScript.
+- **Motion:** its JavaScript API can add spring interactions or entry sequences if a later design needs them. The current CSS animations and native scroll transforms already cover the surrounding UI.
+- **GSAP:** useful for a coordinated timeline or pinned narrative, neither of which is needed for this focused hero fix.
+- **Lenis:** smooth-scroll integration is possible, but native scrolling keeps the existing phone, anchor, and modal behaviour simple.
+
+Avoid adding multiple engines to animate the same property. Essential content is visible before animation code loads.

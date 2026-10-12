@@ -4,10 +4,11 @@
 
 - JavaScript syntax checks for source, scripts, and tests.
 - Production build of the home page, seven product pages, sitemap, robots.txt, and 404 page.
-- 25 automated tests passing with Node's test runner and Linkedom (DOM simulation):
+- 26 automated tests passing with Node's test runner and Linkedom (DOM simulation):
   - expense decimal totals, invalid/negative/excessive input, HTML escaping;
   - all seven system finder outcomes and invalid goal combinations;
-  - finite ribbon geometry;
+  - finite bevelled logo geometry and normals; complete-turn camera projection at phone, narrow tablet, and desktop aspect ratios, including tilt and float;
+  - bundled production renderer loads without CDN or bare package imports; matching local SVG asset is referenced;
   - independent approval state, reset, and preserved hero-tab state;
   - expense form updates, over-budget handling, meter clamping;
   - task movement, column counts, completion state, and reset;
@@ -21,6 +22,8 @@
 - CSS parsed and source formatted with Prettier; `git diff --check` passes.
 
 ## Verification limits
+
+The disappearing hero came from a 15-element rotation matrix in the old raw-WebGL code: matrix multiplication produced non-finite coordinates, but the renderer still hid the SVG fallback. Three.js now owns these matrices. Readiness requires a rendered triangle count and a healthy GL context; failure restores the SVG. The geometry projection regression test covers the invalid-coordinate failure but does not establish GPU output.
 
 This session does not have the supported control-browser skill. No preview server, browser renderer, or browser screenshot run was used. DOM tests do not establish visual layout, actual WebGL shader rendering, native dialog focus containment, iOS scroll behaviour, touch dragging, or real download behaviour. Desktop and phone visual acceptance remains to be checked in a browser.
 
