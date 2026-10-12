@@ -25,11 +25,11 @@ Vercel uses the static build settings in `vercel.json`. All runtime assets, incl
 ## Experience
 
 - A slowly spinning, bevelled 3D N brand monogram with lighting, product colour changes, subtle pointer response, static SVG fallback, and shared motion controls.
-- One compact People device slideshow on the home and product pages, using genuine captures inside phone/laptop frames. Arrows, dots, keyboard and horizontal swipes switch slides; Play slideshow switches screens immediately and then every four seconds, with a progress bar and playing/paused text; desktop captures also scan within the frame.
+- One compact People device slideshow on the home and product pages, using genuine captures inside phone/laptop frames. Arrows, dots, keyboard and horizontal swipes switch slides; The slideshow autoplays when visible and switches screens every four seconds, with a progress bar and playing/paused text; desktop captures also scan within the frame.
 - Motion transitions for device slides, dialogs and section entries, with native scrolling and reduced-motion support. The landing page does not include duplicate full-size workspaces.
 - Working approvals, validated expense entry and budget recalculation, and task movement via buttons or drag and drop. All use fictional demo data.
 - Smaller interactive concepts for Restu.ai, PowerOS, AI Cloud, and SecureIntelligence. AI replies are explicitly scripted, and the security demo does not scan anything.
-- Motion pause/reduced-motion support. Playback stops for focus, interaction, dialogs, hidden tabs and offscreen previews, and never resumes automatically.
+- Motion pause/reduced-motion support. Playback suspends for focus, gestures, dialogs, hidden tabs and offscreen previews, then resumes when appropriate. An explicit Pause remains paused until the user resumes it.
 - A filterable directory and seven static, shareable `/systems/{id}/` product pages with unique metadata, a sitemap, and a 404 page. Legacy `?system=...` links redirect to the corresponding page.
 - A two-question system finder with an explained recommendation, back navigation, and app/product links.
 - Native modal dialogs with focus restoration, phone bottom-sheet styling, drag-handle dismissal, and background scroll locking.

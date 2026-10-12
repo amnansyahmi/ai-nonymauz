@@ -15,6 +15,14 @@ for (const id of ["people", "flow", "kretiv", "people"]) {
   document.body.append(wrapper);
 }
 
+const previewObservers = [];
+class FakeIntersectionObserver {
+  constructor(callback) { this.callback = callback; previewObservers.push(this); }
+  observe(target) { this.target = target; }
+  disconnect() { this.disconnected = true; }
+  emit(isIntersecting) { this.callback([{ target: this.target, isIntersecting }]); }
+}
+const previewVisibility = (value) => previewObservers.find((observer) => observer.target?.matches("[data-device-preview]")).emit(value);
 const mediaQueries = new Map();
 const mediaQuery = (query) => {
   if (!mediaQueries.has(query)) mediaQueries.set(query, { matches: false, listeners: [], addEventListener(_name, callback) { this.listeners.push(callback); } });
@@ -30,6 +38,7 @@ Object.assign(globalThis, {
   requestAnimationFrame: () => 1,
   requestIdleCallback: () => 1,
   matchMedia: mediaQuery,
+  IntersectionObserver: FakeIntersectionObserver,
 });
 window.requestIdleCallback = () => 1;
 window.scrollY = 120;
@@ -121,27 +130,34 @@ test("product experience interactions", async (t) => {
     assert.ok(gallery.querySelector(".device-mobile-capture").getAttribute("src").endsWith("people-directory-mobile.webp"));
     click(gallery.querySelector('[data-device-slide="0"]'));
   });
-  await t.test("play gives an immediate screen change and advances every four seconds until paused", (t) => {
+  await t.test("slideshow autoplays on entering view, suspends offscreen and respects explicit pause", (t) => {
     t.mock.timers.enable({ apis: ["setTimeout"] });
     const gallery = document.querySelector("[data-device-preview]");
     const play = gallery.querySelector("[data-device-play]");
     t.mock.timers.tick(10000);
     assert.equal(gallery.querySelector("[data-device-counter]").textContent, "01 / 03");
-    assert.ok(play.textContent.includes("Play slideshow"));
-    click(play);
+    assert.equal(play.getAttribute("aria-pressed"), "false");
+    previewVisibility(true);
     assert.equal(play.getAttribute("aria-pressed"), "true");
-    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
-    assert.ok(gallery.querySelector(".device-footnote").textContent.includes("slideshow playing"));
+    assert.ok(play.textContent.includes("Pause slideshow"));
     assert.ok(gallery.classList.contains("is-playing"));
     assert.ok(gallery.querySelector(".device-progress > span"));
     t.mock.timers.tick(3999);
-    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "01 / 03");
     t.mock.timers.tick(1);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    previewVisibility(false);
+    assert.equal(play.getAttribute("aria-pressed"), "false");
+    t.mock.timers.tick(13000);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    previewVisibility(true);
+    assert.equal(play.getAttribute("aria-pressed"), "true");
+    t.mock.timers.tick(4000);
     assert.equal(gallery.querySelector("[data-device-counter]").textContent, "03 / 03");
     click(play);
     assert.equal(play.getAttribute("aria-pressed"), "false");
-    assert.ok(gallery.querySelector(".device-footnote").textContent.includes("slideshow paused"));
-    assert.ok(!gallery.classList.contains("is-playing"));
+    previewVisibility(false); previewVisibility(true);
+    assert.equal(play.getAttribute("aria-pressed"), "false");
     t.mock.timers.tick(13000);
     assert.equal(gallery.querySelector("[data-device-counter]").textContent, "03 / 03");
     click(gallery.querySelector('[data-device-slide="0"]'));
@@ -161,7 +177,29 @@ test("product experience interactions", async (t) => {
     click(play);
     click(gallery.querySelector('[data-device-slide="0"]'));
   });
-  await t.test("global pause, reduced motion and hidden tabs stop the preview; arrows stay usable", (t) => {
+  await t.test("a secondary touch does not strand autoplay after the primary gesture ends", (t) => {
+    t.mock.timers.enable({ apis: ["setTimeout"] });
+    const gallery = document.querySelector("[data-device-preview]");
+    const play = gallery.querySelector("[data-device-play]");
+    const stage = gallery.querySelector(".device-stage");
+    const pointer = (name, id, primary) => {
+      const event = new window.Event(name, { bubbles: true });
+      Object.assign(event, { clientX: 200, clientY: 200, pointerId: id, pointerType: "touch", button: 0, isPrimary: primary });
+      stage.dispatchEvent(event);
+    };
+    click(play);
+    pointer("pointerdown", 1, true);
+    assert.equal(play.getAttribute("aria-pressed"), "false");
+    pointer("pointerdown", 2, false);
+    pointer("pointerup", 2, false);
+    pointer("pointerup", 1, true);
+    assert.equal(play.getAttribute("aria-pressed"), "true");
+    t.mock.timers.tick(4000);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "03 / 03");
+    click(play);
+    click(gallery.querySelector('[data-device-slide="0"]'));
+  });
+  await t.test("global pause, reduced motion and hidden tabs suspend and resume automatic playback", (t) => {
     t.mock.timers.enable({ apis: ["setTimeout"] });
     const gallery = document.querySelector("[data-device-preview]");
     const play = gallery.querySelector("[data-device-play]");
@@ -173,39 +211,63 @@ test("product experience interactions", async (t) => {
     click(gallery.querySelector('[data-device-direction="1"]'));
     assert.equal(gallery.querySelector("[data-device-counter]").textContent, "03 / 03");
     click(document.querySelector(".motion-toggle"));
+    assert.equal(play.getAttribute("aria-pressed"), "true");
+    t.mock.timers.tick(4000);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "01 / 03");
     const reduce = mediaQuery("(prefers-reduced-motion: reduce)");
     const change = (matches) => { reduce.matches = matches; reduce.listeners.forEach((listener) => listener({ matches })); };
-    click(play); change(true);
+    change(true);
     assert.ok(play.disabled);
     assert.equal(play.getAttribute("aria-pressed"), "false");
-    change(false); click(play);
+    t.mock.timers.tick(7000);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "01 / 03");
+    change(false);
+    assert.equal(play.getAttribute("aria-pressed"), "true");
     Object.defineProperty(document, "hidden", { configurable: true, writable: true, value: true });
     document.dispatchEvent(new window.Event("visibilitychange"));
     assert.equal(play.getAttribute("aria-pressed"), "false");
+    t.mock.timers.tick(7000);
     document.hidden = false;
     document.dispatchEvent(new window.Event("visibilitychange"));
-    t.mock.timers.tick(7000);
+    assert.equal(play.getAttribute("aria-pressed"), "true");
+    t.mock.timers.tick(4000);
     assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    click(play);
+    document.hidden = true; document.dispatchEvent(new window.Event("visibilitychange"));
+    document.hidden = false; document.dispatchEvent(new window.Event("visibilitychange"));
+    change(true); change(false);
+    assert.equal(play.getAttribute("aria-pressed"), "false", "explicit pause survives temporary suspension");
     click(gallery.querySelector('[data-device-slide="0"]'));
   });
-  await t.test("focus, manual selection and dialogs cancel playback; keyboard navigation works", (t) => {
+  await t.test("focus and dialogs suspend autoplay; manual navigation resets the slide interval", (t) => {
     t.mock.timers.enable({ apis: ["setTimeout"] });
     const gallery = document.querySelector("[data-device-preview]");
     const play = gallery.querySelector("[data-device-play]");
     click(play);
-    gallery.querySelector('[data-device-direction="1"]').dispatchEvent(new window.Event("focusin", { bubbles: true }));
+    const next = gallery.querySelector('[data-device-direction="1"]');
+    next.dispatchEvent(new window.Event("focusin", { bubbles: true }));
     assert.equal(play.getAttribute("aria-pressed"), "false");
-    click(play); click(gallery.querySelector('[data-device-slide="1"]'));
-    assert.equal(play.getAttribute("aria-pressed"), "false");
-    const key = new window.Event("keydown", { bubbles: true, cancelable: true });
-    key.key = "ArrowRight";
-    gallery.querySelector('[data-device-direction="1"]').dispatchEvent(key);
+    next.dispatchEvent(new window.Event("focusout", { bubbles: true }));
+    assert.equal(play.getAttribute("aria-pressed"), "true");
+    t.mock.timers.tick(3000);
+    click(gallery.querySelector('[data-device-slide="1"]'));
+    assert.equal(play.getAttribute("aria-pressed"), "true");
+    t.mock.timers.tick(3999);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    t.mock.timers.tick(1);
     assert.equal(gallery.querySelector("[data-device-counter]").textContent, "03 / 03");
-    click(play); click(document.querySelector("[data-open-finder]"));
+    const key = new window.Event("keydown", { bubbles: true, cancelable: true });
+    key.key = "ArrowRight"; next.dispatchEvent(key);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "01 / 03");
+    click(document.querySelector("[data-open-finder]"));
     assert.equal(play.getAttribute("aria-pressed"), "false");
-    click(document.querySelector("#finder-dialog .dialog-close"));
     t.mock.timers.tick(10000);
     assert.equal(gallery.querySelector("[data-device-counter]").textContent, "01 / 03");
+    click(document.querySelector("#finder-dialog .dialog-close"));
+    assert.equal(play.getAttribute("aria-pressed"), "true");
+    t.mock.timers.tick(4000);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    click(play);
     click(gallery.querySelector('[data-device-slide="0"]'));
   });
   await t.test("horizontal device swipes advance but vertical and cancelled gestures do not", () => {
