@@ -245,6 +245,7 @@ test("product experience interactions", async (t) => {
     const play = gallery.querySelector("[data-device-play]");
     click(play);
     const next = gallery.querySelector('[data-device-direction="1"]');
+    document.dispatchEvent(new window.Event("keydown"));
     next.dispatchEvent(new window.Event("focusin", { bubbles: true }));
     assert.equal(play.getAttribute("aria-pressed"), "false");
     next.dispatchEvent(new window.Event("focusout", { bubbles: true }));
@@ -267,6 +268,41 @@ test("product experience interactions", async (t) => {
     assert.equal(play.getAttribute("aria-pressed"), "true");
     t.mock.timers.tick(4000);
     assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    click(play);
+    click(gallery.querySelector('[data-device-slide="0"]'));
+  });
+  await t.test("touch focus on arrows does not freeze the slideshow", (t) => {
+    t.mock.timers.enable({ apis: ["setTimeout"] });
+    const gallery = document.querySelector("[data-device-preview]");
+    const next = gallery.querySelector('[data-device-direction="1"]');
+    const play = gallery.querySelector('[data-device-play]');
+    click(play);
+    next.dispatchEvent(new window.Event("pointerdown", { bubbles: true }));
+    click(next);
+    next.dispatchEvent(new window.Event("focusin", { bubbles: true }));
+    assert.equal(play.getAttribute("aria-pressed"), "true");
+    t.mock.timers.tick(4000);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "01 / 03");
+    click(play);
+    next.dispatchEvent(new window.Event("focusout", { bubbles: true }));
+  });
+  await t.test("releasing a gesture outside the stage resumes autoplay", (t) => {
+    t.mock.timers.enable({ apis: ["setTimeout"] });
+    const gallery = document.querySelector("[data-device-preview]");
+    const stage = gallery.querySelector('.device-stage');
+    const play = gallery.querySelector('[data-device-play]');
+    const pointer = (target, name, y) => {
+      const event = new window.Event(name, { bubbles: true });
+      Object.assign(event, { clientX: 100, clientY: y, pointerId: 9, pointerType: "touch", button: 0, isPrimary: true });
+      target.dispatchEvent(event);
+    };
+    click(play);
+    pointer(stage, "pointerdown", 200);
+    assert.equal(play.getAttribute("aria-pressed"), "false");
+    pointer(document.body, "pointerup", 10);
+    assert.equal(play.getAttribute("aria-pressed"), "true");
+    t.mock.timers.tick(4000);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "03 / 03");
     click(play);
     click(gallery.querySelector('[data-device-slide="0"]'));
   });

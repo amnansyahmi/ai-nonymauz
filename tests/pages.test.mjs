@@ -3,14 +3,15 @@ import assert from "node:assert/strict";
 import { readFile, stat } from "node:fs/promises";
 import { products, productPages, productPath } from "../products.js";
 const routes = ["/", ...products.map((p) => productPath(p.id))];
-test("production renderer resolves locally without CDN or bare package imports", async () => {
-  const { logoGeometry, startRibbon } = await import("../dist/background.js");
+test("production hero uses a locally served vector with no WebGL dependency", async () => {
+  const { startRibbon } = await import("../dist/background.js");
   assert.equal(typeof startRibbon, "function");
-  const geometry = logoGeometry();
-  assert.ok(geometry.getAttribute("position").count > 0);
-  geometry.dispose();
   const html = await readFile("dist/index.html", "utf8");
-  assert.ok(html.includes('src="/assets/brand/ai-emblem.webp"'));
+  assert.ok(html.includes('src="/assets/brand/ai-emblem.svg"'));
+  assert.ok(!html.includes('id="ribbon-canvas"'));
+  const svg = await readFile("dist/assets/brand/ai-emblem.svg", "utf8");
+  assert.ok(svg.includes('viewBox="0 0 640 520"'));
+  assert.ok(!/<image|<script|https?:/.test(svg.replace('http://www.w3.org/2000/svg', '')));
 });
 test("brand icons retain transparency and correct install-icon dimensions", async () => {
   const emblem = await readFile("dist/assets/brand/ai-emblem.webp");
@@ -49,7 +50,7 @@ for (const route of routes)
     assert.ok(html.includes("Interactive demo"));
     assert.ok(html.includes('/assets/brand/favicon.png'));
     assert.ok(html.includes('/assets/brand/apple-touch-icon.png'));
-    assert.ok(html.includes('/assets/brand/ai-emblem.webp'));
+    assert.ok(html.includes('/assets/brand/ai-emblem.svg'));
     assert.ok(!html.includes('/assets/mark.svg'));
     assert.ok(!html.includes('/assets/logo-sculpture.svg'));
   });

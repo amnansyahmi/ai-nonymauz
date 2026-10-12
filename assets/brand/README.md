@@ -1,6 +1,6 @@
 # AI-Nonymauz brand assets
 
 `logo-original.jpg` is the user-supplied reference, retained unchanged.
-`ai-emblem.webp` is the transparent emblem extracted from that reference with ImageGen, then resized/encoded for local delivery. The favicon and Apple touch icon are smaller PNG derivatives of the same extraction. No logo font is substituted into the emblem.
+`ai-emblem.svg` is a Bézier vector rendition of its folded A, separate i and cyan/blue/violet palette. All visible site branding uses this scalable asset. The favicon and Apple touch icon PNGs are rendered from this vector with a square viewBox.
 
-The site's readable wordmark remains live text beside the emblem. `lib/brand-outline.js` traces the transparent emblem's alpha silhouette for the hero's thin extrusion; its face UVs align with the same WebP. Brand colours stay fixed across product interactions.
+`ai-emblem.webp` is the earlier ImageGen extraction, retained as a source reference. Its edge noise and the coarse extruded outline are no longer used for visible branding. The site wordmark remains readable live text beside the emblem.

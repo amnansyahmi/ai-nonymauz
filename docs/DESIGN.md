@@ -18,7 +18,9 @@ This is a slideshow of actual screenshots, not a live product recording or a fab
 
 ## Animation and performance
 
-Three.js renders the supplied cyan/blue/violet Ai emblem on its extruded alpha silhouette, with lit edges, a slow full turn and desktop pointer tilt. The same transparent WebP is used in the header, footer and fallback; PNG derivatives provide the favicon and Apple touch icon. Texture loading and healthy-frame validation control the image fallback; context loss/restoration and page teardown are handled. Pixel density and frame rate are capped; motion suspends offscreen, in hidden tabs, behind dialogs and when paused/reduced.
+The supplied Ai reference is redrawn as smooth Bézier paths in a locally served SVG, retaining its folded A, separate i and cyan/blue/violet palette. The vector is animated directly in CSS, with an automatic slow turn, vertical drift, soft shadow and breathing orbit. Motion starts without WebGL, mouse input or idle loading. Lifecycle code suspends it offscreen, in hidden tabs, behind dialogs and when paused/reduced; desktop pointer tilt is optional. Headers and favicons use the same vector; the Apple icon is rendered from it.
+
+Device frames use a definite height and aspect ratio, with the screen absolutely inset, so intrinsic screenshot dimensions cannot stretch the phone in Safari. Mobile stages are 290–340px high and the phone occupies 86% of that height. Device floating and screenshot changes run automatically. Pointer-triggered focus does not leave the slideshow paused; keyboard focus still suspends it. Gestures released outside the stage and page restoration clear temporary input suspension.
 
 Motion's locally bundled mini API animates device slide changes, dialogs and section entries. Content is never hidden in advance. There is no scroll hijacking, page-wide scroll loop, CDN dependency, or multiple animation engines writing the same property. CSS owns the device scan and button states; Motion animates the stage.
 

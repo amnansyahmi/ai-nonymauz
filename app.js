@@ -1,3 +1,4 @@
+import { startRibbon } from "./background.js";
 import { products, productPages, productPath } from "./products.js";
 import { icon, escapeHTML as e } from "./lib/ui.js";
 import { initialiseDevicePreviews } from "./lib/captures.js";
@@ -221,18 +222,5 @@ motionButtons.forEach((b) =>
 );
 reduceMotion.addEventListener("change", updateMotion);
 updateMotion();
-// Load the decorative renderer after the content and interactions are available.
-if (document.querySelector("#ribbon-canvas")) {
-  const load = () =>
-    import("./background.js")
-      .then((m) =>
-        m.startRibbon({
-          paused: paused || reduceMotion.matches,
-          product: "people",
-        }),
-      )
-      .catch(() => {});
-  if ("requestIdleCallback" in window)
-    requestIdleCallback(load, { timeout: 1600 });
-  else setTimeout(load, 100);
-}
+// The vector animation is visible immediately; this manages its lifecycle.
+startRibbon({ paused: paused || reduceMotion.matches });
