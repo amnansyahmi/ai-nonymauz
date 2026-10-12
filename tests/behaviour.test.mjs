@@ -7,8 +7,6 @@ import {
   recommendSystem,
   finderChoices,
 } from "../lib/demo-state.js";
-import { logoGeometry } from "../background.js";
-import { Euler, Matrix4, PerspectiveCamera, Vector3 } from "three";
 import { swipeDirection } from "../lib/captures.js";
 import { escapeHTML } from "../lib/ui.js";
 test("expense totals remain accurate after decimal additions", () => {
@@ -59,32 +57,6 @@ test("demo text escapes user-provided HTML", () => {
     "&lt;img src=x onerror=&quot;alert(1)&quot;&gt; &amp; &#39;test&#39;",
   );
 });
-test("logo geometry stays finite and inside the camera through a complete spin", () => {
-  const geometry = logoGeometry();
-  const positions = geometry.getAttribute("position");
-  assert.ok(positions.count > 100);
-  assert.ok(geometry.getAttribute("normal").array.every(Number.isFinite));
-  // The previous renderer's malformed matrix made every projected vertex NaN.
-  // Narrow tablets, 320/390px phones, and wide desktop hero containers.
-  for (const aspect of [.45, 272 / 270, 342 / 295, 1.8]) {
-    const camera = new PerspectiveCamera(35, aspect, .1, 30);
-    camera.position.z = Math.max(6.6, 4.5 / aspect);
-    camera.updateMatrixWorld();
-    for (let step = 0; step < 24; step++) {
-      const matrix = new Matrix4().makeRotationFromEuler(new Euler(.20, step * Math.PI / 12, -.08));
-      for (let i = 0; i < positions.count; i++) {
-        const point = new Vector3().fromBufferAttribute(positions, i).applyMatrix4(matrix);
-        point.y += .045;
-        point.project(camera);
-        assert.ok(point.toArray().every(Number.isFinite));
-        assert.ok(Math.abs(point.x) < 1 && Math.abs(point.y) < 1);
-        assert.ok(point.z > -1 && point.z < 1);
-      }
-    }
-  }
-  geometry.dispose();
-});
-
 test("swipe intent requires a meaningful horizontal gesture", () => {
   assert.equal(swipeDirection(-80, 10), 1);
   assert.equal(swipeDirection(80, 10), -1);

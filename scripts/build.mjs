@@ -12,7 +12,7 @@ for (const file of [
   "lib",
 ])
   await cp(file, `dist/${file}`, { recursive: true });
-// Bundle Motion and the lazy-loaded Three.js scene locally, without CDN calls.
+// Bundle Motion and the lightweight hero lifecycle locally, without CDN calls.
 await build({
   entryPoints: ["app.js", "background.js"], outdir: "dist",
   bundle: true, splitting: true, format: "esm", minify: true, target: "es2022",

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 520" fill="none">
+  <title>AI-Nonymauz</title>
+  <defs>
+    <linearGradient id="rise" x1="206" y1="78" x2="466" y2="337" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#94ffff"/><stop offset=".3" stop-color="#20d9ff"/>
+      <stop offset=".65" stop-color="#1767ff"/><stop offset="1" stop-color="#2014be"/>
+    </linearGradient>
+    <linearGradient id="fold" x1="160" y1="351" x2="297" y2="169" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0ac7fb"/><stop offset=".46" stop-color="#0678ed"/>
+      <stop offset="1" stop-color="#061b62"/>
+    </linearGradient>
+    <linearGradient id="sweep" x1="119" y1="437" x2="547" y2="321" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#15d7f9"/><stop offset=".27" stop-color="#0293f5"/>
+      <stop offset=".51" stop-color="#44f2ff"/><stop offset=".72" stop-color="#245bff"/>
+      <stop offset="1" stop-color="#e69cff"/>
+    </linearGradient>
+    <linearGradient id="stem" x1="509" y1="212" x2="581" y2="461" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e7d5ff"/><stop offset=".27" stop-color="#a48eff"/>
+      <stop offset=".6" stop-color="#6b48ff"/><stop offset="1" stop-color="#351ac6"/>
+    </linearGradient>
+    <radialGradient id="dot" cx="0" cy="0" r="1" gradientTransform="translate(519 111) rotate(48) scale(83)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#b8ffff"/><stop offset=".38" stop-color="#6ac5ff"/>
+      <stop offset=".72" stop-color="#805cff"/><stop offset="1" stop-color="#ecacff"/>
+    </radialGradient>
+    <linearGradient id="shine" x1="223" y1="292" x2="560" y2="472" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#efffff"/><stop offset=".43" stop-color="#bcffff"/><stop offset="1" stop-color="#e8c6ff"/>
+    </linearGradient>
+  </defs>
+  <circle cx="540" cy="135" r="46" fill="url(#dot)" stroke="#e7e6ff" stroke-width="1.5"/>
+  <path d="M508 207H522C563 207 593 237 593 277V469L508 331V207Z" fill="url(#stem)" stroke="#d5bdff" stroke-width="1.5"/>
+  <path d="M43 438L264 79C280 50 296 38 319 38C344 38 363 51 379 80L510 324C483 300 469 287 443 276C416 264 402 258 389 235L319 199C307 177 291 180 279 202L215 310L148 369L119 437L43 438Z" fill="url(#rise)"/>
+  <path d="M87 367L205 172C229 133 260 132 282 151C298 164 310 181 319 199C307 177 291 180 279 202L215 310C171 332 123 378 100 382C87 385 80 379 87 367Z" fill="url(#fold)"/>
+  <path d="M43 438L87 367C76 389 95 388 117 379C184 351 249 289 307 277C367 264 425 286 468 339L579 482H491C464 482 448 468 432 443L392 375C366 332 340 315 307 321C257 330 216 373 182 425L157 461C146 477 133 482 112 482H61C38 482 29 463 43 438Z" fill="url(#sweep)"/>
+  <path d="M87 367C77 388 96 388 118 379C185 351 249 290 307 278C367 265 425 287 468 340L579 482H491C464 482 448 468 432 443" stroke="url(#shine)" stroke-width="2" stroke-linecap="round"/>
+  <path d="M264 79C280 50 296 38 319 38C344 38 363 51 379 80" stroke="#bdffff" stroke-width="1.5" stroke-linecap="round"/>
+</svg>
