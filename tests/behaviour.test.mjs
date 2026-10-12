@@ -9,6 +9,7 @@ import {
 } from "../lib/demo-state.js";
 import { logoGeometry } from "../background.js";
 import { Euler, Matrix4, PerspectiveCamera, Vector3 } from "three";
+import { swipeDirection } from "../lib/captures.js";
 import { escapeHTML } from "../lib/ui.js";
 test("expense totals remain accurate after decimal additions", () => {
   const items = initialExpenses();
@@ -82,4 +83,11 @@ test("logo geometry stays finite and inside the camera through a complete spin",
     }
   }
   geometry.dispose();
+});
+
+test("swipe intent requires a meaningful horizontal gesture", () => {
+  assert.equal(swipeDirection(-80, 10), 1);
+  assert.equal(swipeDirection(80, 10), -1);
+  assert.equal(swipeDirection(-20, 0), 0);
+  assert.equal(swipeDirection(-80, 100), 0);
 });

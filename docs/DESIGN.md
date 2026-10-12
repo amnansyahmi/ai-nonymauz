@@ -2,32 +2,32 @@
 
 ## Direction
 
-Warm white, navy, and blue; Archivo for the interface and system serif italics for occasional emphasis. The composition uses a sculpted N brand mark, an open product directory, alternating large demo showcases, and a quiet closing section. Each product has an accent colour and an individual detail page.
+Warm white, navy and blue; Archivo for the interface and system serif italics for occasional emphasis. The landing page uses the spinning N brand mark, an open product directory, one compact device-led preview and a quiet closing section. Each product has an accent colour and an individual detail page.
 
-The visitor progression is introduction → switchable sample workspace → system directory → three playable workflows → wedding planning → shared design principles → FAQ → system finder/project brief.
+Visitor progression: introduction → system directory → People device slideshow → wedding planning → shared design principles → FAQ → system finder/project brief.
 
-## Seven improvements
+## Device presentation
 
-1. **3D hero:** the navigation's N + crossbar brand mark extruded as one bevelled piece in Three.js. Studio lighting, a soft CSS ground shadow, a full turn every 24 seconds, mouse tilt, and product palette interpolation. A matching local SVG rotates with CSS when WebGL is unavailable; it remains visible until a healthy frame draws triangles and returns after rendering failure or context loss. Context restoration rebuilds the scene; page exit disposes GPU resources and listeners. The renderer loads after content, caps pixel density and frame rate, and suspends offscreen, behind dialogs, in hidden tabs, or when motion is paused/reduced. Three.js is bundled locally using esbuild.
-2. **Playable demos:** approve requests and update pending counts; enter validated expenses and recalculate the budget; move project tasks using buttons or dragging. Each demo owns independent state. Hero tab changes preserve its existing state; Reset and reload restore sample data.
-3. **Scroll presentation:** the hero workspace straightens as it enters view, and the larger demo scenes settle into position. Native page scrolling is preserved; no scroll lock or forced scene progression. Small screens and reduced-motion preferences use static transforms.
-4. **Composition:** readable typography and deliberate spacing; a compact product directory replaces the repeated catalogue cards; product workflows have larger individual showcases.
-5. **Product pages:** seven static pages with useful descriptions, a three-step walkthrough, interactive illustrations, app destinations, availability notes, and related products. The People page includes real repository screenshots of a demo workspace. Other pages show explicitly illustrative mobile workspaces, not invented screenshots.
-6. **System finder:** goal-based routing covering all seven products, a plain-language reason, relevant features, and back navigation. It uses local rules, not an AI request.
-7. **Mobile:** responsive demo layouts, stacked Kanban stages, touch controls, 16px expense inputs to avoid input-focus zoom, bottom-sheet dialogs, fixed-body background scroll locking, native focus containment, Escape/close/backdrop dismissal, and optional handle swipe dismissal. Pinch zoom remains available for accessibility.
+The oversized screenshot gallery and “A little look inside” workspace section have been removed. The three large duplicate People/FlowTrack/KretivOS workspaces are no longer embedded in the landing page; all individual product pages retain their interactive demos.
+
+People uses one reusable slideshow on the landing and People detail pages. Actual interface captures sit inside CSS laptop/phone silhouettes. Desktop shows the paired devices; mobile uses a small laptop behind the main phone. The fixed-height, clipped stage prevents tall screenshots from stretching the page. The leave slide contains only a phone because no matching desktop capture exists. The same image is never presented as a different device's interface.
+
+Arrows, dots, keyboard navigation and horizontal swipes select slides. Vertical page scrolling and pinch zoom remain native. The slideshow starts automatically when it enters the viewport and advances every 4 seconds with a visible progress bar and playing/paused text; desktop captures gently scan from top to bottom within the laptop screen. Pause holds the current screen position. Focus on other controls, pointer gestures, dialogs, hidden tabs, global motion pause/reduction and leaving the viewport temporarily suspend playback. It resumes automatically when those conditions clear, while respecting reduced motion and global pause. Manual navigation resets the interval. Pressing Pause explicitly disables autoplay until the user resumes it. Focus on the toggle and mouse hover do not interrupt playback; secondary touch events do not strand the primary gesture state. Live announcements are suppressed during automatic playback. See assets/products/README.md for capture provenance.
+
+This is a slideshow of actual screenshots, not a live product recording or a fabricated video. No recording asset is available. The hardware frames are native HTML/CSS and remain sharp at any display density.
+
+## Animation and performance
+
+Three.js renders a locally bundled, bevelled N brand mark with studio lighting, a slow full turn and desktop pointer tilt. Healthy-frame validation controls the SVG fallback; context loss/restoration and page teardown are handled. Pixel density and frame rate are capped; motion suspends offscreen, in hidden tabs, behind dialogs and when paused/reduced.
+
+Motion's locally bundled mini API animates device slide changes, dialogs and section entries. Content is never hidden in advance. There is no scroll hijacking, page-wide scroll loop, CDN dependency, or multiple animation engines writing the same property. CSS owns the device scan and button states; Motion animates the stage.
+
+## Product functionality
+
+Seven static product pages retain descriptions, feature lists, three-step workflows, interactive sample demos, current app destinations, availability notes and related products. Demo approvals, validated expenses and task movements work with fictional data. The system finder covers all seven systems and explains its recommendation. The project brief downloads locally and is not submitted.
 
 ## Integrity and accessibility
 
-No invented customers, testimonials, adoption metrics, shared-account claims, prices, or cross-product integrations. All interactive demonstrations are labelled; cloud replies are scripted and security steps are illustrative. Product descriptions retain configuration/availability notes. The brief is downloaded locally, never submitted.
+No invented customers, testimonials, adoption metrics, shared-account claims, prices or integrations. Cloud demo replies are scripted and security steps are illustrative. Device previews use sample captures and separately captured device sessions. Screenshots are not claims that the current live deployment was inspected.
 
-Semantic landmarks, one H1 per page, native links/buttons, wrapped input labels, live status messages, visible keyboard focus, and keyboard alternatives to dragging. The mobile menu and all toggles expose state. Motion is optional, and essential content never depends on the canvas or scroll animations.
-
-
-## Animation library choices
-
-- **Three.js (implemented):** camera/matrix handling, bevelled geometry, lighting, and WebGL context restoration for the spinning logo. R3F is a React renderer; this site uses plain JavaScript.
-- **Motion:** its JavaScript API can add spring interactions or entry sequences if a later design needs them. The current CSS animations and native scroll transforms already cover the surrounding UI.
-- **GSAP:** useful for a coordinated timeline or pinned narrative, neither of which is needed for this focused hero fix.
-- **Lenis:** smooth-scroll integration is possible, but native scrolling keeps the existing phone, anchor, and modal behaviour simple.
-
-Avoid adding multiple engines to animate the same property. Essential content is visible before animation code loads.
+Semantic landmarks, one H1 per page, native links/buttons, visible focus, labelled controls and keyboard alternatives to gestures. Device controls have 44px targets. Native dialogs retain focus restoration, phone bottom-sheet styling and background scroll locking. Essential content is independent of animation support.

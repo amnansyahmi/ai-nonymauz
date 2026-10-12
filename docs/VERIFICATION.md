@@ -1,34 +1,33 @@
-# Verification — product experience redesign
+# Verification — responsive device preview
 
 ## Completed
 
-- JavaScript syntax checks for source, scripts, and tests.
-- Production build of the home page, seven product pages, sitemap, robots.txt, and 404 page.
-- 26 automated tests passing with Node's test runner and Linkedom (DOM simulation):
-  - expense decimal totals, invalid/negative/excessive input, HTML escaping;
-  - all seven system finder outcomes and invalid goal combinations;
-  - finite bevelled logo geometry and normals; complete-turn camera projection at phone, narrow tablet, and desktop aspect ratios, including tilt and float;
-  - bundled production renderer loads without CDN or bare package imports; matching local SVG asset is referenced;
-  - independent approval state, reset, and preserved hero-tab state;
-  - expense form updates, over-budget handling, meter clamping;
-  - task movement, column counts, completion state, and reset;
-  - finder back navigation, dialog closure, saved scroll restoration;
-  - directory filters, menu state, motion pause;
-  - brief validation and downloaded content;
-  - Restu, operations, scripted chat, and security demo interactions;
-  - all generated pages: unique IDs, one main/H1, local link/asset resolution, canonical metadata, shared dialogs;
-  - complete product definitions and sitemap coverage.
-- Source screenshots visually inspected: People employee directory explicitly marked as demo/sample data, and the mobile leave screen. Converted to WebP without altering their content.
-- CSS parsed and source formatted with Prettier; `git diff --check` passes.
+- JavaScript syntax checks and production build of home, seven product pages, sitemap and 404.
+- 34 automated tests passing with Node and Linkedom. DOM interaction tests execute the production app bundle; product demo fixtures come from generated product-page markup.
+- Checks cover:
+  - removal of the duplicate hero demo and oversized raw gallery; one home device presentation;
+  - arrow/dot wrapping, correct real image selection, and hiding the laptop on the phone-only leave slide;
+  - viewport-triggered autoplay, four-second advancement, progress/playing state and explicit pause persistence;
+  - late play-toggle focus and mouse hover do not undo playback; other focus/dialog suspension, resumption and manual interval resets;
+  - global pause/reduced motion, hidden tabs and offscreen suspension/resumption; explicit pause prevents automatic restart;
+  - secondary touch events preserve the primary gesture and permit playback to resume;
+  - keyboard controls and horizontal/vertical/cancelled touch-gesture intent;
+  - independent approvals/reset, expense totals/validation/HTML escaping, Kanban movement and counts;
+  - finder outcomes/back navigation, menu/filter state, dialog scroll restoration and downloaded brief;
+  - remaining Restu/operations/scripted chat/security demos;
+  - finite Three.js geometry and full-turn camera projection at phone, tablet and desktop aspect ratios;
+  - locally resolving renderer bundle, generated landmarks/IDs/links/assets, product definitions and sitemap.
+- The real People source captures were visually inspected in the earlier capture work; this feedback's iPhone screenshot was inspected before redesign.
+- Responsive CSS constraints reviewed and git diff --check passes.
 
-## Verification limits
+## Limits
 
-The disappearing hero came from a 15-element rotation matrix in the old raw-WebGL code: matrix multiplication produced non-finite coordinates, but the renderer still hid the SVG fallback. Three.js now owns these matrices. Readiness requires a rendered triangle count and a healthy GL context; failure restores the SVG. The geometry projection regression test covers the invalid-coordinate failure but does not establish GPU output.
+The supported control-browser skill is unavailable. No preview server, browser rendering or new browser screenshot was used. DOM simulation does not establish visual layout, GPU output, touch-event delivery, Web Animations output or native dialog behaviour. Desktop/iPhone visual acceptance is outstanding.
 
-This session does not have the supported control-browser skill. No preview server, browser renderer, or browser screenshot run was used. DOM tests do not establish visual layout, actual WebGL shader rendering, native dialog focus containment, iOS scroll behaviour, touch dragging, or real download behaviour. Desktop and phone visual acceptance remains to be checked in a browser.
+## Browser acceptance
 
-Vercel project-detail access returned HTTP 403 for the target team; release status is checked through the repository's deployment/status integration where available.
+At 320, 390, 768 and 1440px, verify contained laptop/phone frames with no page overflow, legible controls and stable stage height between paired-device and phone-only slides. Confirm that no oversized gallery or “A little look inside” section remains. Check real captures sit within the frames and the tall dashboard scans inside the laptop only during requested playback.
 
-## Browser acceptance checklist
+Scroll the preview into view: verify autoplay, a visible progress bar, playing status and screen changes every four seconds without clicking. Pause explicitly and verify it remains paused after leaving/re-entering the viewport or hiding/showing the tab. Resume with the toggle. Move the mouse over the mockup and verify playback continues. Test Safari click/focus ordering on the toggle. Use arrows, dots, keyboard and a horizontal swipe; a vertical swipe must scroll normally. Play/pause, interact with controls, focus the carousel, open a dialog, hide the tab, scroll offscreen and change reduced-motion preferences. Ensure temporary suspension resumes automatically, while an explicit user pause persists. Manual navigation remains available in both states. Check pause holds the current screenshot position, browser Back restores functional controls, and rapid changes do not leave blank/stale captures.
 
-Check home and all seven product pages at 1440, 768, 390, and 320px. Verify no page-level horizontal overflow; all text/buttons fit; the 3D mark is visible; selecting a hero product changes its colour; the SVG fallback works with WebGL disabled; reduced motion/pause/hidden-tab/offscreen behaviour works. Exercise all demos, finder/back navigation, expense errors, brief download, screenshot enlargement, mobile menu, and dialog scrolling. Test Escape, keyboard-only use, pinch zoom, and bottom-sheet close/handle gesture. Follow every product's external app link.
+Verify the spinning logo/SVG fallback, individual product demos, menus, finder and brief download. The device preview is an animated slideshow of screenshots, not a live video recording.
