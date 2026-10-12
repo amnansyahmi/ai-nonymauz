@@ -3,7 +3,7 @@
 ## Completed
 
 - JavaScript syntax checks and production build of home, seven product pages, sitemap and 404.
-- 34 automated tests passing with Node and Linkedom. DOM interaction tests execute the production app bundle; product demo fixtures come from generated product-page markup.
+- 35 automated tests passing with Node and Linkedom. DOM interaction tests execute the production app bundle; product demo fixtures come from generated product-page markup.
 - Checks cover:
   - removal of the duplicate hero demo and oversized raw gallery; one home device presentation;
   - arrow/dot wrapping, correct real image selection, and hiding the laptop on the phone-only leave slide;
@@ -16,6 +16,7 @@
   - finder outcomes/back navigation, menu/filter state, dialog scroll restoration and downloaded brief;
   - remaining Restu/operations/scripted chat/security demos;
   - finite Three.js geometry and full-turn camera projection at phone, tablet and desktop aspect ratios;
+  - Ai face texture UV bounds, transparent local brand assets, correct favicon/Apple icon dimensions and new branding on every generated page;
   - locally resolving renderer bundle, generated landmarks/IDs/links/assets, product definitions and sitemap.
 - The real People source captures were visually inspected in the earlier capture work; this feedback's iPhone screenshot was inspected before redesign.
 - Responsive CSS constraints reviewed and git diff --check passes.
@@ -30,4 +31,4 @@ At 320, 390, 768 and 1440px, verify contained laptop/phone frames with no page o
 
 Scroll the preview into view: verify autoplay, a visible progress bar, playing status and screen changes every four seconds without clicking. Pause explicitly and verify it remains paused after leaving/re-entering the viewport or hiding/showing the tab. Resume with the toggle. Move the mouse over the mockup and verify playback continues. Test Safari click/focus ordering on the toggle. Use arrows, dots, keyboard and a horizontal swipe; a vertical swipe must scroll normally. Play/pause, interact with controls, focus the carousel, open a dialog, hide the tab, scroll offscreen and change reduced-motion preferences. Ensure temporary suspension resumes automatically, while an explicit user pause persists. Manual navigation remains available in both states. Check pause holds the current screenshot position, browser Back restores functional controls, and rapid changes do not leave blank/stale captures.
 
-Verify the spinning logo/SVG fallback, individual product demos, menus, finder and brief download. The device preview is an animated slideshow of screenshots, not a live video recording.
+Verify the spinning Ai logo/transparent image fallback, individual product demos, menus, finder and brief download. The device preview is an animated slideshow of screenshots, not a live video recording.

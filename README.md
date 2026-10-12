@@ -24,7 +24,7 @@ Vercel uses the static build settings in `vercel.json`. All runtime assets, incl
 
 ## Experience
 
-- A slowly spinning, bevelled 3D N brand monogram with lighting, product colour changes, subtle pointer response, static SVG fallback, and shared motion controls.
+- The supplied cyan/blue/violet Ai logo across the header, footer, favicon, Apple touch icon and hero. The hero uses its transparent artwork on an extruded silhouette with a slow spin, subtle desktop pointer response, image fallback and shared motion controls.
 - One compact People device slideshow on the home and product pages, using genuine captures inside phone/laptop frames. Arrows, dots, keyboard and horizontal swipes switch slides; The slideshow autoplays when visible and switches screens every four seconds, with a progress bar and playing/paused text; desktop captures also scan within the frame.
 - Motion transitions for device slides, dialogs and section entries, with native scrolling and reduced-motion support. The landing page does not include duplicate full-size workspaces.
 - Working approvals, validated expense entry and budget recalculation, and task movement via buttons or drag and drop. All use fictional demo data.
@@ -44,7 +44,7 @@ Vercel uses the static build settings in `vercel.json`. All runtime assets, incl
 - `app.js`: navigation, system finder, dialogs, motion coordination, brief download.
 - `lib/transitions.js`: Motion mini transitions and shared motion controls.
 - `lib/captures.js`: real capture metadata, device mockup slideshow, swipe intent, playback and lifecycle controls.
-- `background.js`: Three.js scene, extruded brand geometry, and renderer lifecycle.
+- `background.js`: Three.js scene, textured Ai silhouette and renderer lifecycle.
 - `styles.css`: responsive styles and design tokens.
 - `scripts/build.mjs`: static pages, metadata, sitemap, assets.
 - `tests/`: state, DOM interaction, geometry, and generated-page checks.

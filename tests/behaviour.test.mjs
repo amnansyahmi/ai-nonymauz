@@ -64,6 +64,7 @@ test("logo geometry stays finite and inside the camera through a complete spin",
   const positions = geometry.getAttribute("position");
   assert.ok(positions.count > 100);
   assert.ok(geometry.getAttribute("normal").array.every(Number.isFinite));
+  assert.ok(geometry.getAttribute("uv").array.every((v) => Number.isFinite(v) && v >= 0 && v <= 1), "artwork UVs must stay inside the supplied emblem");
   // The previous renderer's malformed matrix made every projected vertex NaN.
   // Narrow tablets, 320/390px phones, and wide desktop hero containers.
   for (const aspect of [.45, 272 / 270, 342 / 295, 1.8]) {

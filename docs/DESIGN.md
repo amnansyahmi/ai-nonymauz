@@ -18,7 +18,7 @@ This is a slideshow of actual screenshots, not a live product recording or a fab
 
 ## Animation and performance
 
-Three.js renders a locally bundled, bevelled N brand mark with studio lighting, a slow full turn and desktop pointer tilt. Healthy-frame validation controls the SVG fallback; context loss/restoration and page teardown are handled. Pixel density and frame rate are capped; motion suspends offscreen, in hidden tabs, behind dialogs and when paused/reduced.
+Three.js renders the supplied cyan/blue/violet Ai emblem on its extruded alpha silhouette, with lit edges, a slow full turn and desktop pointer tilt. The same transparent WebP is used in the header, footer and fallback; PNG derivatives provide the favicon and Apple touch icon. Texture loading and healthy-frame validation control the image fallback; context loss/restoration and page teardown are handled. Pixel density and frame rate are capped; motion suspends offscreen, in hidden tabs, behind dialogs and when paused/reduced.
 
 Motion's locally bundled mini API animates device slide changes, dialogs and section entries. Content is never hidden in advance. There is no scroll hijacking, page-wide scroll loop, CDN dependency, or multiple animation engines writing the same property. CSS owns the device scan and button states; Motion animates the stage.
 

@@ -10,7 +10,20 @@ test("production renderer resolves locally without CDN or bare package imports",
   assert.ok(geometry.getAttribute("position").count > 0);
   geometry.dispose();
   const html = await readFile("dist/index.html", "utf8");
-  assert.ok(html.includes('src="/assets/logo-sculpture.svg"'));
+  assert.ok(html.includes('src="/assets/brand/ai-emblem.webp"'));
+});
+test("brand icons retain transparency and correct install-icon dimensions", async () => {
+  const emblem = await readFile("dist/assets/brand/ai-emblem.webp");
+  assert.equal(emblem.toString("ascii", 0, 4), "RIFF");
+  assert.equal(emblem.toString("ascii", 8, 12), "WEBP");
+  assert.ok(emblem.includes(Buffer.from("ALPH")), "emblem must retain its transparent background");
+  for (const [name, size] of [["favicon.png", 96], ["apple-touch-icon.png", 180]]) {
+    const png = await readFile(`dist/assets/brand/${name}`);
+    assert.equal(png.toString("ascii", 12, 16), "IHDR");
+    assert.equal(png.readUInt32BE(16), size);
+    assert.equal(png.readUInt32BE(20), size);
+    assert.equal(png[25], 6, "icon must use RGBA");
+  }
 });
 for (const route of routes)
   test(`generated page ${route} has valid local destinations and unique landmarks`, async () => {
@@ -34,6 +47,11 @@ for (const route of routes)
     assert.ok(html.includes('id="finder-dialog"'));
     assert.ok(html.includes('id="brief-dialog"'));
     assert.ok(html.includes("Interactive demo"));
+    assert.ok(html.includes('/assets/brand/favicon.png'));
+    assert.ok(html.includes('/assets/brand/apple-touch-icon.png'));
+    assert.ok(html.includes('/assets/brand/ai-emblem.webp'));
+    assert.ok(!html.includes('/assets/mark.svg'));
+    assert.ok(!html.includes('/assets/logo-sculpture.svg'));
   });
 test("every product has a complete page definition and an HTTPS app destination", () => {
   for (const p of products) {

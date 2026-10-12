@@ -1,38 +1,45 @@
 import {
   AmbientLight, Color, DirectionalLight, ExtrudeGeometry, Group, Mesh,
-  MeshStandardMaterial, Path, PerspectiveCamera, Scene, Shape, WebGLRenderer,
+  Float32BufferAttribute, MeshBasicMaterial, MeshStandardMaterial, Path,
+  PerspectiveCamera, Scene, Shape, SRGBColorSpace, TextureLoader, WebGLRenderer,
 } from "three";
+import { brandOutline } from "./lib/brand-outline.js";
 
-const palettes = { people: "#3157df", flow: "#247c65", kretiv: "#7758bd" };
-
-// The N + crossbar from assets/mark.svg, as one solid bevelled piece.
+// Extrude the supplied Ai silhouette; its original colours are printed on both faces.
 export function logoGeometry() {
-  const shape = new Shape();
-  const outline = [
-    [-1, -1], [-.68, -1], [-.68, -.18], [-.22, -.18], [.68, -1],
-    [1, -1], [1, 1], [.68, 1], [.68, .18], [.22, .18], [-.68, 1], [-1, 1],
-  ];
-  outline.forEach(([x, y], i) => i ? shape.lineTo(x, y) : shape.moveTo(x, y));
-  shape.closePath();
-  for (const points of [
-    [[-.68, .18], [-.22, .18], [-.68, .60]],
-    [[.68, -.18], [.22, -.18], [.68, -.60]],
-  ]) {
+  const shapes = brandOutline.filter((c) => !c.hole).map(({ points }) => {
+    const shape = new Shape();
+    points.forEach(([x, y], i) => i ? shape.lineTo(x, y) : shape.moveTo(x, y));
+    shape.closePath();
+    return shape;
+  });
+  // The A cutout belongs to the large ribbon; the i dot is a separate shape.
+  for (const { points } of brandOutline.filter((c) => c.hole)) {
     const hole = new Path();
     points.forEach(([x, y], i) => i ? hole.lineTo(x, y) : hole.moveTo(x, y));
     hole.closePath();
-    shape.holes.push(hole);
+    shapes[0].holes.push(hole);
   }
-  const geometry = new ExtrudeGeometry(shape, {
-    depth: .38, steps: 1, bevelEnabled: true,
-    bevelThickness: .055, bevelSize: .045, bevelSegments: 4,
+  const geometry = new ExtrudeGeometry(shapes, {
+    depth: .16, steps: 1, bevelEnabled: false,
   });
-  geometry.translate(0, 0, -.19);
+  geometry.translate(0, 0, -.08);
+  const positions = geometry.getAttribute("position");
+  const uv = geometry.getAttribute("uv");
+  const cyan = new Color("#16d9ff"), violet = new Color("#9853ff");
+  const colours = [];
+  for (let i = 0; i < positions.count; i++) {
+    const x = positions.getX(i), y = positions.getY(i);
+    uv.setXY(i, .5 + x / 2.5, .5 + y / 2.5);
+    const colour = cyan.clone().lerp(violet, Math.max(0, Math.min(1, .5 + x / 2.5)));
+    colours.push(colour.r, colour.g, colour.b);
+  }
+  geometry.setAttribute("color", new Float32BufferAttribute(colours, 3));
   geometry.computeBoundingSphere();
   return geometry;
 }
 
-export function startRibbon({ paused = false, product = "people" } = {}) {
+export function startRibbon({ paused = false } = {}) {
   const canvas = document.querySelector("#ribbon-canvas");
   if (!canvas) return;
   const host = canvas.parentElement;
@@ -46,16 +53,17 @@ export function startRibbon({ paused = false, product = "people" } = {}) {
   try {
     renderer = new WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "low-power" });
   } catch {
-    return; // The locally served SVG is already visible.
+    return; // The locally served transparent emblem is already visible.
   }
   renderer.setClearColor(0x000000, 0);
   const scene = new Scene();
   const camera = new PerspectiveCamera(35, 1, .1, 30);
   camera.position.set(0, 0, 6.6);
-  const material = new MeshStandardMaterial({ color: palettes[product] || palettes.people, roughness: .26, metalness: .32 });
+  const face = new MeshBasicMaterial({ transparent: true, alphaTest: .08, toneMapped: false });
+  const edge = new MeshStandardMaterial({ vertexColors: true, roughness: .26, metalness: .32 });
   const geometry = logoGeometry();
   const logo = new Group();
-  logo.add(new Mesh(geometry, material));
+  logo.add(new Mesh(geometry, [face, edge]));
   scene.add(logo);
   scene.add(new AmbientLight(0xffffff, 2));
   const key = new DirectionalLight(0xffffff, 4);
@@ -67,20 +75,32 @@ export function startRibbon({ paused = false, product = "people" } = {}) {
   const fill = new DirectionalLight(0xffffff, 1.5);
   fill.position.set(1, -3, 3);
   scene.add(fill);
-  const targetColor = new Color(palettes[product] || palettes.people);
   let visible = true, dialogOpen = Boolean(document.querySelector("dialog[open]"));
   let lost = false, disposed = false, frame = 0, last = 0, elapsed = 0;
   let painted = 0, width = 0, height = 0, px = 0, py = 0, targetX = 0, targetY = 0;
+  let textureReady = false;
+  const texture = new TextureLoader().load("/assets/brand/ai-emblem.webp", (loaded) => {
+    if (disposed) { loaded.dispose(); return; }
+    loaded.colorSpace = SRGBColorSpace;
+    face.map = loaded;
+    face.needsUpdate = true;
+    textureReady = true;
+    draw(); update();
+  }, undefined, () => {
+    if (disposed) return;
+    lost = true;
+    host.classList.remove("webgl-ready");
+    update();
+  });
 
   function draw() {
-    if (!width || !height || lost || disposed) return;
+    if (!width || !height || !textureReady || lost || disposed) return;
     const stop = paused || motion.matches;
     // One complete turn every 24 seconds. Pausing holds the current pose.
     px += (targetX - px) * .08;
     py += (targetY - py) * .08;
     logo.rotation.set(.10 + (stop ? 0 : py * .10), -.30 + elapsed * Math.PI * 2 / 24000 + (stop ? 0 : px * .20), -.08);
     logo.position.y = stop ? 0 : Math.sin(elapsed / 1600) * .045;
-    material.color.lerp(targetColor, stop ? 1 : .08);
     try {
       renderer.render(scene, camera);
       // Rendering can fail without throwing (e.g. shader compilation). Never
@@ -137,10 +157,6 @@ export function startRibbon({ paused = false, product = "people" } = {}) {
     targetY = ((event.clientY - r.top) / r.height) * 2 - 1;
   });
   listen(host, "pointerleave", () => { targetX = 0; targetY = 0; });
-  listen(document, "product-change", (event) => {
-    targetColor.set(palettes[event.detail] || palettes.people);
-    draw(); update();
-  });
   listen(document, "motion-state", (event) => { paused = event.detail; update(); });
   listen(document, "dialog-state", (event) => { dialogOpen = event.detail; update(); });
   listen(document, "visibilitychange", update);
@@ -157,7 +173,7 @@ export function startRibbon({ paused = false, product = "people" } = {}) {
     cancelAnimationFrame(frame);
     resizeObserver.disconnect(); observer.disconnect();
     cleanup.forEach((remove) => remove());
-    geometry.dispose(); material.dispose(); renderer.dispose();
+    geometry.dispose(); face.dispose(); edge.dispose(); texture.dispose(); renderer.dispose();
     host.classList.remove("webgl-ready", "logo-idle");
   }
   listen(window, "pagehide", (event) => {
