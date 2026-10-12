@@ -1,6 +1,8 @@
 import { products, productPages, productPath } from "./products.js";
 import { icon, escapeHTML as e } from "./lib/ui.js";
-import { demoShell } from "./lib/demo-views.js";
+import { initialiseShowcase } from "./lib/showcase.js";
+import { initialiseCaptures } from "./lib/captures.js";
+import { initialiseTransitions, transitionIn } from "./lib/transitions.js";
 import { initialiseDemos } from "./lib/demos.js";
 import { finderChoices, recommendSystem } from "./lib/demo-state.js";
 
@@ -10,6 +12,8 @@ const oldProduct = new URL(location.href).searchParams.get("system");
 if (products.some((p) => p.id === oldProduct))
   location.replace(productPath(oldProduct));
 initialiseDemos();
+initialiseTransitions();
+initialiseCaptures();
 
 const menuButton = document.querySelector(".menu-button");
 const menu = document.querySelector("#mobile-nav");
@@ -50,6 +54,7 @@ function openDialog(dialog, trigger) {
   document.body.style.top = `-${savedScroll}px`;
   document.body.style.width = "100%";
   dialog.showModal();
+  transitionIn(dialog);
   document.dispatchEvent(new CustomEvent("dialog-state", { detail: true }));
 }
 function closeDialog(dialog) {
@@ -202,40 +207,7 @@ document.querySelectorAll("[data-filter]").forEach((button) =>
       `Showing ${count} systems.`;
   }),
 );
-const demoCache = new Map();
-const preview = document.querySelector("#hero-preview");
-let activePreview = "people";
-if (preview) demoCache.set("people", preview.firstElementChild);
-document.querySelectorAll("[data-preview]").forEach((button) =>
-  button.addEventListener("click", () => {
-    const id = button.dataset.preview;
-    if (id === activePreview) return;
-    activePreview = id;
-    if (!demoCache.has(id)) {
-      const wrapper = document.createElement("div");
-      wrapper.innerHTML = demoShell(id, { compact: true });
-      demoCache.set(id, wrapper.firstElementChild);
-    }
-    preview.replaceChildren(demoCache.get(id));
-    initialiseDemos(preview);
-    document
-      .querySelectorAll("[data-preview]")
-      .forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
-    const p = products.find((x) => x.id === id);
-    const link = document.querySelector("[data-preview-link]");
-    link.href = productPath(id);
-    link.innerHTML = `Meet ${e(p.short)} ${icon("arrow-up-right")}`;
-    document.querySelector("[data-preview-description]").innerHTML = {
-      people: "Two requests.<br>One clear next step.",
-      flow: "Your month.<br>A clearer picture.",
-      kretiv: "Good ideas.<br>Moving forward.",
-    }[id];
-    document.querySelector(".workbench-number").textContent =
-      productPages[id].number;
-    document.querySelector(".hero-art").dataset.tone = id;
-    document.dispatchEvent(new CustomEvent("product-change", { detail: id }));
-  }),
-);
+const showcaseController = initialiseShowcase();
 const motionButtons = [...document.querySelectorAll(".motion-toggle")];
 function updateMotion() {
   document.documentElement.classList.toggle("motion-paused", paused);
@@ -308,7 +280,7 @@ if (document.querySelector("#ribbon-canvas")) {
       .then((m) =>
         m.startRibbon({
           paused: paused || reduceMotion.matches,
-          product: activePreview,
+          product: showcaseController.activeProduct,
         }),
       )
       .catch(() => {});

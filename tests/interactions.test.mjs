@@ -7,6 +7,11 @@ const { window } = parseHTML(
   await readFile(new URL("../dist/index.html", import.meta.url), "utf8"),
 );
 const { document } = window;
+const mediaQueries = new Map();
+const mediaQuery = (query) => {
+  if (!mediaQueries.has(query)) mediaQueries.set(query, { matches: false, listeners: [], addEventListener(_name, callback) { this.listeners.push(callback); } });
+  return mediaQueries.get(query);
+};
 Object.assign(globalThis, {
   window,
   document,
@@ -16,7 +21,7 @@ Object.assign(globalThis, {
   innerWidth: 1440,
   requestAnimationFrame: () => 1,
   requestIdleCallback: () => 1,
-  matchMedia: () => ({ matches: false, addEventListener() {} }),
+  matchMedia: mediaQuery,
 });
 window.requestIdleCallback = () => 1;
 window.scrollY = 120;
@@ -71,7 +76,8 @@ const submit = (form) =>
   form.dispatchEvent(
     new window.Event("submit", { bubbles: true, cancelable: true }),
   );
-await import("../app.js");
+// Exercise the shipped bundle, including locally resolved Motion imports.
+await import("../dist/app.js");
 
 test("product experience interactions", async (t) => {
   await t.test(
@@ -104,6 +110,137 @@ test("product experience interactions", async (t) => {
       document.querySelector("#hero-preview [data-pending-count]").textContent,
       "1",
     );
+  });
+  await t.test("workflow mode preserves interactive state and supports direct steps", () => {
+    const hero = document.querySelector("#hero-preview [data-demo]");
+    const pending = hero.querySelector("[data-pending-count]").textContent;
+    click(document.querySelector('[data-showcase-mode="tour"]'));
+    assert.ok(document.querySelector("#hero-preview").hidden);
+    assert.ok(!document.querySelector("#walkthrough-view").hidden);
+    click(document.querySelector('[data-tour-step="2"]'));
+    assert.ok(document.querySelector("#tour-frame").textContent.includes("Approved"));
+    assert.ok(document.querySelector("#tour-frame").textContent.includes("16 days"));
+    assert.ok(document.querySelector('[data-tour-direction="1"]').disabled);
+    assert.equal(document.querySelector('[data-tour-step="2"]').getAttribute("aria-current"), "step");
+    click(document.querySelector('[data-showcase-mode="try"]'));
+    assert.ok(!document.querySelector("#hero-preview").hidden);
+    assert.equal(document.querySelector("#hero-preview [data-pending-count]").textContent, pending);
+  });
+  await t.test("walkthrough playback advances once and stops at the final step", (t) => {
+    t.mock.timers.enable({ apis: ["setTimeout"] });
+    click(document.querySelector('[data-showcase-mode="tour"]'));
+    click(document.querySelector("[data-tour-play]"));
+    assert.equal(document.querySelector("[data-tour-play]").getAttribute("aria-pressed"), "true");
+    t.mock.timers.tick(2800);
+    assert.equal(document.querySelector('[data-tour-step="1"]').getAttribute("aria-current"), "step");
+    t.mock.timers.tick(2800);
+    assert.equal(document.querySelector('[data-tour-step="2"]').getAttribute("aria-current"), "step");
+    assert.equal(document.querySelector("[data-tour-play]").getAttribute("aria-pressed"), "false");
+    t.mock.timers.tick(10000);
+    assert.equal(document.querySelector('[data-tour-step="2"]').getAttribute("aria-current"), "step");
+    click(document.querySelector('[data-showcase-mode="try"]'));
+  });
+  await t.test("changing products cancels playback and keeps each workflow independent", (t) => {
+    t.mock.timers.enable({ apis: ["setTimeout"] });
+    click(document.querySelector('[data-showcase-mode="tour"]'));
+    click(document.querySelector("[data-tour-play]"));
+    click(document.querySelector('[data-preview="flow"]'));
+    assert.equal(document.querySelector("[data-tour-play]").getAttribute("aria-pressed"), "false");
+    t.mock.timers.tick(10000);
+    assert.equal(document.querySelector('[data-tour-step="0"]').getAttribute("aria-current"), "step");
+    click(document.querySelector('[data-tour-step="2"]'));
+    assert.ok(document.querySelector("#tour-frame").textContent.includes("RM 1,680"));
+    click(document.querySelector('[data-preview="kretiv"]'));
+    click(document.querySelector('[data-tour-step="2"]'));
+    assert.ok(document.querySelector("#tour-frame").textContent.includes("For review"));
+    click(document.querySelector('[data-preview="people"]'));
+    assert.equal(document.querySelector('[data-tour-step="0"]').getAttribute("aria-current"), "step");
+    click(document.querySelector('[data-showcase-mode="try"]'));
+  });
+  await t.test("motion pause and dialogs cancel playback; manual steps remain usable", (t) => {
+    t.mock.timers.enable({ apis: ["setTimeout"] });
+    click(document.querySelector('[data-showcase-mode="tour"]'));
+    click(document.querySelector("[data-tour-play]"));
+    click(document.querySelector(".motion-toggle"));
+    assert.ok(document.querySelector("[data-tour-play]").disabled);
+    assert.ok(!document.querySelector("[data-playback-note]").hidden);
+    t.mock.timers.tick(6000);
+    assert.equal(document.querySelector('[data-tour-step="0"]').getAttribute("aria-current"), "step");
+    click(document.querySelector('[data-tour-step="1"]'));
+    assert.equal(document.querySelector('[data-tour-step="1"]').getAttribute("aria-current"), "step");
+    click(document.querySelector(".motion-toggle"));
+    assert.ok(!document.querySelector("[data-tour-play]").disabled);
+    click(document.querySelector("[data-tour-play]"));
+    click(document.querySelector("[data-open-finder]"));
+    assert.equal(document.querySelector("[data-tour-play]").getAttribute("aria-pressed"), "false");
+    click(document.querySelector("#finder-dialog .dialog-close"));
+    t.mock.timers.tick(6000);
+    assert.equal(document.querySelector('[data-tour-step="0"]').getAttribute("aria-current"), "step");
+    click(document.querySelector('[data-showcase-mode="try"]'));
+  });
+  await t.test("reduced motion and hidden tabs cancel playback without restarting it", (t) => {
+    t.mock.timers.enable({ apis: ["setTimeout"] });
+    const reduce = mediaQuery("(prefers-reduced-motion: reduce)");
+    const change = (matches) => { reduce.matches = matches; reduce.listeners.forEach((listener) => listener({ matches })); };
+    click(document.querySelector('[data-showcase-mode="tour"]'));
+    click(document.querySelector("[data-tour-play]"));
+    change(true);
+    assert.ok(document.querySelector("[data-tour-play]").disabled);
+    t.mock.timers.tick(6000);
+    assert.equal(document.querySelector('[data-tour-step="0"]').getAttribute("aria-current"), "step");
+    click(document.querySelector('[data-tour-step="2"]'));
+    assert.equal(document.querySelector('[data-tour-step="2"]').getAttribute("aria-current"), "step");
+    change(false);
+    click(document.querySelector("[data-tour-play]"));
+    Object.defineProperty(document, "hidden", { configurable: true, writable: true, value: true });
+    document.dispatchEvent(new window.Event("visibilitychange"));
+    assert.equal(document.querySelector("[data-tour-play]").getAttribute("aria-pressed"), "false");
+    document.hidden = false;
+    document.dispatchEvent(new window.Event("visibilitychange"));
+    t.mock.timers.tick(6000);
+    assert.equal(document.querySelector('[data-tour-step="0"]').getAttribute("aria-current"), "step");
+    click(document.querySelector('[data-showcase-mode="try"]'));
+  });
+  await t.test("horizontal surface swipes switch systems without stealing form or vertical gestures", () => {
+    const surface = document.querySelector(".hero-workbench");
+    const pointer = (target, name, x, y) => {
+      const event = new window.Event(name, { bubbles: true });
+      Object.assign(event, { clientX: x, clientY: y, pointerId: 1, pointerType: "touch", button: 0, isPrimary: true });
+      target.dispatchEvent(event);
+    };
+    pointer(surface, "pointerdown", 200, 200);
+    pointer(surface, "pointerup", 80, 210);
+    assert.equal(document.querySelector('[data-preview="kretiv"]').getAttribute("aria-pressed"), "true");
+    pointer(surface, "pointerdown", 200, 200);
+    pointer(surface, "pointerup", 190, 80);
+    assert.equal(document.querySelector('[data-preview="kretiv"]').getAttribute("aria-pressed"), "true");
+    click(document.querySelector('[data-preview="flow"]'));
+    const input = document.querySelector("#hero-preview input");
+    pointer(input, "pointerdown", 200, 200);
+    pointer(input, "pointerup", 80, 210);
+    assert.equal(document.querySelector('[data-preview="flow"]').getAttribute("aria-pressed"), "true");
+    click(document.querySelector('[data-showcase-direction="1"]'));
+    assert.equal(document.querySelector('[data-preview="people"]').getAttribute("aria-pressed"), "true");
+  });
+  await t.test("capture switches update full-size image and restore preferred device after phone-only screen", () => {
+    const gallery = document.querySelector("[data-capture-gallery]");
+    click(gallery.querySelector('[data-capture-device="mobile"]'));
+    assert.ok(gallery.querySelector("img").getAttribute("src").includes("overview-mobile"));
+    click(gallery.querySelector('[data-capture-scene="directory"]'));
+    assert.ok(gallery.querySelector("img").getAttribute("src").includes("directory-mobile"));
+    assert.equal(gallery.querySelector(".capture-enlarge").dataset.image, gallery.querySelector("img").getAttribute("src"));
+    click(gallery.querySelector('[data-capture-device="desktop"]'));
+    click(gallery.querySelector('[data-capture-scene="leave"]'));
+    assert.ok(gallery.querySelector('[data-capture-device="desktop"]').disabled);
+    assert.equal(gallery.querySelector(".capture-stage").dataset.device, "mobile");
+    click(gallery.querySelector('[data-capture-scene="directory"]'));
+    assert.equal(gallery.querySelector(".capture-stage").dataset.device, "desktop");
+    click(gallery.querySelector(".capture-enlarge"));
+    const dialog = document.querySelector("#image-dialog");
+    assert.ok(dialog.open);
+    assert.equal(dialog.querySelector("img").getAttribute("src"), "/assets/products/people-desktop.webp");
+    click(dialog.querySelector(".dialog-close"));
+    assert.equal(document._testFocus, gallery.querySelector(".capture-enlarge"));
   });
   await t.test(
     "expense form updates balance, escapes text, and handles over-budget state",
