@@ -18,6 +18,7 @@
     "linkedom": "^0.18.12"
   },
   "dependencies": {
+    "motion": "^14.1.0",
     "three": "^0.186.1"
   }
 }

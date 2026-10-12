@@ -7,16 +7,15 @@ await rm("dist", { recursive: true, force: true });
 await mkdir("dist", { recursive: true });
 for (const file of [
   "styles.css",
-  "app.js",
   "products.js",
   "assets",
   "lib",
 ])
   await cp(file, `dist/${file}`, { recursive: true });
-// Lazy-loaded, bundled locally: no CDN or bare imports in the browser.
+// Bundle Motion and the lazy-loaded Three.js scene locally, without CDN calls.
 await build({
-  entryPoints: ["background.js"], outfile: "dist/background.js",
-  bundle: true, format: "esm", minify: true, target: "es2022",
+  entryPoints: ["app.js", "background.js"], outdir: "dist",
+  bundle: true, splitting: true, format: "esm", minify: true, target: "es2022",
   legalComments: "linked",
 });
 const template = await readFile("index.html", "utf8");

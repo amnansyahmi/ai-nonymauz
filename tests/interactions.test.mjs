@@ -7,6 +7,19 @@ const { window } = parseHTML(
   await readFile(new URL("../dist/index.html", import.meta.url), "utf8"),
 );
 const { document } = window;
+for (const id of ["people", "flow", "kretiv", "people"]) {
+  const route = parseHTML(await readFile(new URL(`../dist/systems/${id}/index.html`, import.meta.url), "utf8"));
+  const wrapper = document.createElement("section");
+  wrapper.className = `test-${id}${document.querySelector(`.test-${id}`) ? "-second" : ""}`;
+  wrapper.innerHTML = route.document.querySelector("[data-demo]").outerHTML;
+  document.body.append(wrapper);
+}
+
+const mediaQueries = new Map();
+const mediaQuery = (query) => {
+  if (!mediaQueries.has(query)) mediaQueries.set(query, { matches: false, listeners: [], addEventListener(_name, callback) { this.listeners.push(callback); } });
+  return mediaQueries.get(query);
+};
 Object.assign(globalThis, {
   window,
   document,
@@ -16,7 +29,7 @@ Object.assign(globalThis, {
   innerWidth: 1440,
   requestAnimationFrame: () => 1,
   requestIdleCallback: () => 1,
-  matchMedia: () => ({ matches: false, addEventListener() {} }),
+  matchMedia: mediaQuery,
 });
 window.requestIdleCallback = () => 1;
 window.scrollY = 120;
@@ -71,44 +84,126 @@ const submit = (form) =>
   form.dispatchEvent(
     new window.Event("submit", { bubbles: true, cancelable: true }),
   );
-await import("../app.js");
+// Exercise the shipped bundle, including locally resolved Motion imports.
+await import("../dist/app.js");
 
 test("product experience interactions", async (t) => {
-  await t.test(
-    "approval updates only its own demo and reset restores it",
-    () => {
-      const hero = document.querySelector("#hero-preview [data-demo]");
-      const separate = document.querySelector(".story-people [data-demo]");
-      click(hero.querySelector("[data-approve]"));
-      assert.equal(hero.querySelector("[data-pending-count]").textContent, "1");
-      assert.equal(
-        separate.querySelector("[data-pending-count]").textContent,
-        "2",
-      );
-      assert.ok(
-        hero.querySelector(".demo-feedback").textContent.includes("approved"),
-      );
-      click(hero.querySelector("[data-reset]"));
-      assert.equal(hero.querySelector("[data-pending-count]").textContent, "2");
-    },
-  );
-  await t.test("switching previews preserves in-progress demo state", () => {
-    click(document.querySelector("#hero-preview [data-approve]"));
-    click(document.querySelector('[data-preview="flow"]'));
-    assert.equal(
-      document.querySelector("[data-preview-link]").getAttribute("href"),
-      "/systems/flow/",
-    );
-    click(document.querySelector('[data-preview="people"]'));
-    assert.equal(
-      document.querySelector("#hero-preview [data-pending-count]").textContent,
-      "1",
-    );
+  await t.test("product approval updates only its own instance and reset restores it", () => {
+    const first = document.querySelector(".test-people [data-demo]");
+    const second = document.querySelector(".test-people-second [data-demo]");
+    click(first.querySelector("[data-approve]"));
+    assert.equal(first.querySelector("[data-pending-count]").textContent, "1");
+    assert.equal(second.querySelector("[data-pending-count]").textContent, "2");
+    click(first.querySelector("[data-reset]"));
+    assert.equal(first.querySelector("[data-pending-count]").textContent, "2");
+  });
+  await t.test("landing page has one device presentation and no oversized gallery or hero demo", () => {
+    assert.equal(document.querySelectorAll("[data-device-preview]").length, 1);
+    assert.equal(document.querySelector(".hero-showcase"), null);
+    assert.equal(document.querySelector(".real-captures-section"), null);
+    assert.equal(document.querySelector("[data-capture-gallery]"), null);
+    assert.ok(!document.body.textContent.includes("A LITTLE LOOK INSIDE"));
+    assert.ok(document.querySelector(".mockup-laptop .device-desktop-capture"));
+    assert.ok(document.querySelector(".mockup-phone .device-mobile-capture"));
+  });
+  await t.test("device arrows wrap and phone-only slide hides the laptop rather than inventing a screen", () => {
+    const gallery = document.querySelector("[data-device-preview]");
+    click(gallery.querySelector('[data-device-direction="-1"]'));
+    assert.equal(gallery.querySelector(".device-stage").dataset.layout, "phone");
+    assert.ok(gallery.querySelector(".mockup-laptop").hidden);
+    assert.ok(gallery.querySelector(".device-mobile-capture").getAttribute("src").endsWith("people-mobile.webp"));
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "03 / 03");
+    click(gallery.querySelector('[data-device-direction="1"]'));
+    assert.equal(gallery.querySelector(".device-stage").dataset.layout, "both");
+    assert.ok(!gallery.querySelector(".mockup-laptop").hidden);
+    click(gallery.querySelector('[data-device-slide="1"]'));
+    assert.equal(gallery.querySelector('[data-device-slide="1"]').getAttribute("aria-pressed"), "true");
+    assert.ok(gallery.querySelector(".device-mobile-capture").getAttribute("src").endsWith("people-directory-mobile.webp"));
+    click(gallery.querySelector('[data-device-slide="0"]'));
+  });
+  await t.test("slideshow only plays when requested and pause keeps the selected screen", (t) => {
+    t.mock.timers.enable({ apis: ["setTimeout"] });
+    const gallery = document.querySelector("[data-device-preview]");
+    const play = gallery.querySelector("[data-device-play]");
+    t.mock.timers.tick(10000);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "01 / 03");
+    click(play);
+    assert.equal(play.getAttribute("aria-pressed"), "true");
+    t.mock.timers.tick(6500);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    click(play);
+    assert.equal(play.getAttribute("aria-pressed"), "false");
+    t.mock.timers.tick(13000);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    click(gallery.querySelector('[data-device-slide="0"]'));
+  });
+  await t.test("global pause, reduced motion and hidden tabs stop the preview; arrows stay usable", (t) => {
+    t.mock.timers.enable({ apis: ["setTimeout"] });
+    const gallery = document.querySelector("[data-device-preview]");
+    const play = gallery.querySelector("[data-device-play]");
+    click(play);
+    click(document.querySelector(".motion-toggle"));
+    assert.ok(play.disabled);
+    t.mock.timers.tick(7000);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "01 / 03");
+    click(gallery.querySelector('[data-device-direction="1"]'));
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    click(document.querySelector(".motion-toggle"));
+    const reduce = mediaQuery("(prefers-reduced-motion: reduce)");
+    const change = (matches) => { reduce.matches = matches; reduce.listeners.forEach((listener) => listener({ matches })); };
+    click(play); change(true);
+    assert.ok(play.disabled);
+    assert.equal(play.getAttribute("aria-pressed"), "false");
+    change(false); click(play);
+    Object.defineProperty(document, "hidden", { configurable: true, writable: true, value: true });
+    document.dispatchEvent(new window.Event("visibilitychange"));
+    assert.equal(play.getAttribute("aria-pressed"), "false");
+    document.hidden = false;
+    document.dispatchEvent(new window.Event("visibilitychange"));
+    t.mock.timers.tick(7000);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    click(gallery.querySelector('[data-device-slide="0"]'));
+  });
+  await t.test("focus, manual selection and dialogs cancel playback; keyboard navigation works", (t) => {
+    t.mock.timers.enable({ apis: ["setTimeout"] });
+    const gallery = document.querySelector("[data-device-preview]");
+    const play = gallery.querySelector("[data-device-play]");
+    click(play);
+    gallery.querySelector('[data-device-direction="1"]').dispatchEvent(new window.Event("focusin", { bubbles: true }));
+    assert.equal(play.getAttribute("aria-pressed"), "false");
+    click(play); click(gallery.querySelector('[data-device-slide="1"]'));
+    assert.equal(play.getAttribute("aria-pressed"), "false");
+    const key = new window.Event("keydown", { bubbles: true, cancelable: true });
+    key.key = "ArrowRight";
+    gallery.querySelector('[data-device-direction="1"]').dispatchEvent(key);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "03 / 03");
+    click(play); click(document.querySelector("[data-open-finder]"));
+    assert.equal(play.getAttribute("aria-pressed"), "false");
+    click(document.querySelector("#finder-dialog .dialog-close"));
+    t.mock.timers.tick(10000);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "03 / 03");
+    click(gallery.querySelector('[data-device-slide="0"]'));
+  });
+  await t.test("horizontal device swipes advance but vertical and cancelled gestures do not", () => {
+    const gallery = document.querySelector("[data-device-preview]");
+    const stage = gallery.querySelector(".device-stage");
+    const pointer = (name, x, y) => {
+      const event = new window.Event(name, { bubbles: true });
+      Object.assign(event, { clientX: x, clientY: y, pointerId: 1, pointerType: "touch", button: 0, isPrimary: true });
+      stage.dispatchEvent(event);
+    };
+    pointer("pointerdown", 200, 200); pointer("pointerup", 80, 205);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    pointer("pointerdown", 200, 200); pointer("pointerup", 190, 80);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    pointer("pointerdown", 200, 200); pointer("pointercancel", 200, 200); pointer("pointerup", 80, 205);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    click(gallery.querySelector('[data-device-slide="0"]'));
   });
   await t.test(
     "expense form updates balance, escapes text, and handles over-budget state",
     () => {
-      const app = document.querySelector(".story-flow [data-demo]");
+      const app = document.querySelector(".test-flow [data-demo]");
       const form = app.querySelector("form");
       form.elements.expenseName.value = "<img src=x>";
       form.elements.expenseAmount.value = "2000.50";
@@ -148,7 +243,7 @@ test("product experience interactions", async (t) => {
   await t.test(
     "tasks move across the board with counts and final state updated",
     () => {
-      const app = document.querySelector(".story-kretiv [data-demo]");
+      const app = document.querySelector(".test-kretiv [data-demo]");
       const task = app.querySelector('[data-task="brief"]');
       click(task.querySelector("button"));
       assert.equal(task.parentElement.dataset.stage, "1");

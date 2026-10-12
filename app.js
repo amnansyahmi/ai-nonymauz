@@ -1,6 +1,7 @@
 import { products, productPages, productPath } from "./products.js";
 import { icon, escapeHTML as e } from "./lib/ui.js";
-import { demoShell } from "./lib/demo-views.js";
+import { initialiseDevicePreviews } from "./lib/captures.js";
+import { initialiseTransitions, transitionIn } from "./lib/transitions.js";
 import { initialiseDemos } from "./lib/demos.js";
 import { finderChoices, recommendSystem } from "./lib/demo-state.js";
 
@@ -10,6 +11,8 @@ const oldProduct = new URL(location.href).searchParams.get("system");
 if (products.some((p) => p.id === oldProduct))
   location.replace(productPath(oldProduct));
 initialiseDemos();
+initialiseTransitions();
+initialiseDevicePreviews();
 
 const menuButton = document.querySelector(".menu-button");
 const menu = document.querySelector("#mobile-nav");
@@ -50,6 +53,7 @@ function openDialog(dialog, trigger) {
   document.body.style.top = `-${savedScroll}px`;
   document.body.style.width = "100%";
   dialog.showModal();
+  transitionIn(dialog);
   document.dispatchEvent(new CustomEvent("dialog-state", { detail: true }));
 }
 function closeDialog(dialog) {
@@ -149,14 +153,7 @@ document.addEventListener("click", (event) => {
   }
   const briefTrigger = event.target.closest("[data-open-brief]");
   if (briefTrigger) openDialog(brief, briefTrigger);
-  const imageTrigger = event.target.closest("[data-image]");
-  if (imageTrigger) {
-    const dialog = document.querySelector("#image-dialog");
-    const img = dialog.querySelector("img");
-    img.src = imageTrigger.dataset.image;
-    img.alt = imageTrigger.dataset.alt;
-    openDialog(dialog, imageTrigger);
-  }
+
 });
 document.querySelector("#brief-form").addEventListener("submit", (event) => {
   event.preventDefault();
@@ -202,40 +199,6 @@ document.querySelectorAll("[data-filter]").forEach((button) =>
       `Showing ${count} systems.`;
   }),
 );
-const demoCache = new Map();
-const preview = document.querySelector("#hero-preview");
-let activePreview = "people";
-if (preview) demoCache.set("people", preview.firstElementChild);
-document.querySelectorAll("[data-preview]").forEach((button) =>
-  button.addEventListener("click", () => {
-    const id = button.dataset.preview;
-    if (id === activePreview) return;
-    activePreview = id;
-    if (!demoCache.has(id)) {
-      const wrapper = document.createElement("div");
-      wrapper.innerHTML = demoShell(id, { compact: true });
-      demoCache.set(id, wrapper.firstElementChild);
-    }
-    preview.replaceChildren(demoCache.get(id));
-    initialiseDemos(preview);
-    document
-      .querySelectorAll("[data-preview]")
-      .forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
-    const p = products.find((x) => x.id === id);
-    const link = document.querySelector("[data-preview-link]");
-    link.href = productPath(id);
-    link.innerHTML = `Meet ${e(p.short)} ${icon("arrow-up-right")}`;
-    document.querySelector("[data-preview-description]").innerHTML = {
-      people: "Two requests.<br>One clear next step.",
-      flow: "Your month.<br>A clearer picture.",
-      kretiv: "Good ideas.<br>Moving forward.",
-    }[id];
-    document.querySelector(".workbench-number").textContent =
-      productPages[id].number;
-    document.querySelector(".hero-art").dataset.tone = id;
-    document.dispatchEvent(new CustomEvent("product-change", { detail: id }));
-  }),
-);
 const motionButtons = [...document.querySelectorAll(".motion-toggle")];
 function updateMotion() {
   document.documentElement.classList.toggle("motion-paused", paused);
@@ -249,7 +212,6 @@ function updateMotion() {
   document.dispatchEvent(
     new CustomEvent("motion-state", { detail: paused || reduceMotion.matches }),
   );
-  updateScroll();
 }
 motionButtons.forEach((b) =>
   b.addEventListener("click", () => {
@@ -258,48 +220,6 @@ motionButtons.forEach((b) =>
   }),
 );
 reduceMotion.addEventListener("change", updateMotion);
-const stories = [...document.querySelectorAll("[data-story]")];
-const showcase = document.querySelector(".hero-showcase");
-let scrollFrame = 0;
-function updateScroll() {
-  scrollFrame = 0;
-  const disabled = paused || reduceMotion.matches || innerWidth <= 600;
-  if (showcase) {
-    const rect = showcase.getBoundingClientRect();
-    const progress = disabled
-      ? 1
-      : Math.max(
-          0,
-          Math.min(
-            1,
-            (innerHeight - rect.top) / Math.max(1, innerHeight * 0.8),
-          ),
-        );
-    document.documentElement.style.setProperty("--stage-progress", progress);
-  }
-  stories.forEach((section) => {
-    const r = section.getBoundingClientRect();
-    if (r.bottom < 0 || r.top > innerHeight) return;
-    const progress = disabled
-      ? 1
-      : Math.max(0, Math.min(1, (innerHeight - r.top) / (innerHeight * 0.7)));
-    section.style.setProperty("--scene-progress", progress);
-  });
-}
-window.addEventListener(
-  "scroll",
-  () => {
-    if (!scrollFrame) scrollFrame = requestAnimationFrame(updateScroll);
-  },
-  { passive: true },
-);
-window.addEventListener(
-  "resize",
-  () => {
-    if (!scrollFrame) scrollFrame = requestAnimationFrame(updateScroll);
-  },
-  { passive: true },
-);
 updateMotion();
 // Load the decorative renderer after the content and interactions are available.
 if (document.querySelector("#ribbon-canvas")) {
@@ -308,7 +228,7 @@ if (document.querySelector("#ribbon-canvas")) {
       .then((m) =>
         m.startRibbon({
           paused: paused || reduceMotion.matches,
-          product: activePreview,
+          product: "people",
         }),
       )
       .catch(() => {});
