@@ -3,11 +3,12 @@
 ## Completed
 
 - JavaScript syntax checks and production build of home, seven product pages, sitemap and 404.
-- 32 automated tests passing with Node and Linkedom. DOM interaction tests execute the production app bundle; product demo fixtures come from generated product-page markup.
+- 33 automated tests passing with Node and Linkedom. DOM interaction tests execute the production app bundle; product demo fixtures come from generated product-page markup.
 - Checks cover:
   - removal of the duplicate hero demo and oversized raw gallery; one home device presentation;
   - arrow/dot wrapping, correct real image selection, and hiding the laptop on the phone-only leave slide;
-  - opt-in slideshow playback, pause, manual selection/focus/dialog cancellation;
+  - immediate play feedback, four-second advancement, pause and progress/playing state;
+  - late play-toggle focus and mouse hover do not undo playback; manual selection/other focus/dialog cancellation remains;
   - global pause, reduced-motion and hidden-tab cancellation without automatic restart;
   - keyboard controls and horizontal/vertical/cancelled touch-gesture intent;
   - independent approvals/reset, expense totals/validation/HTML escaping, Kanban movement and counts;
@@ -26,6 +27,6 @@ The supported control-browser skill is unavailable. No preview server, browser r
 
 At 320, 390, 768 and 1440px, verify contained laptop/phone frames with no page overflow, legible controls and stable stage height between paired-device and phone-only slides. Confirm that no oversized gallery or “A little look inside” section remains. Check real captures sit within the frames and the tall dashboard scans inside the laptop only during requested playback.
 
-Use arrows, dots, keyboard and a horizontal swipe; a vertical swipe must scroll normally. Play/pause, interact with controls, focus the carousel, open a dialog, hide the tab, scroll offscreen and change reduced-motion preferences. Ensure playback stops and stays stopped while manual navigation remains available. Check pause holds the current screenshot position, browser Back restores functional controls, and rapid changes do not leave blank/stale captures.
+Press Play slideshow: verify an immediate screen change, a visible progress bar, playing status, and subsequent screen changes every four seconds on desktop and phone. Move the mouse over the mockup and verify playback continues. Test Safari click/focus ordering on the toggle. Use arrows, dots, keyboard and a horizontal swipe; a vertical swipe must scroll normally. Play/pause, interact with controls, focus the carousel, open a dialog, hide the tab, scroll offscreen and change reduced-motion preferences. Ensure playback stops and stays stopped while manual navigation remains available. Check pause holds the current screenshot position, browser Back restores functional controls, and rapid changes do not leave blank/stale captures.
 
 Verify the spinning logo/SVG fallback, individual product demos, menus, finder and brief download. The device preview is an animated slideshow of screenshots, not a live video recording.

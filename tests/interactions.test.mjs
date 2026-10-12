@@ -121,20 +121,44 @@ test("product experience interactions", async (t) => {
     assert.ok(gallery.querySelector(".device-mobile-capture").getAttribute("src").endsWith("people-directory-mobile.webp"));
     click(gallery.querySelector('[data-device-slide="0"]'));
   });
-  await t.test("slideshow only plays when requested and pause keeps the selected screen", (t) => {
+  await t.test("play gives an immediate screen change and advances every four seconds until paused", (t) => {
     t.mock.timers.enable({ apis: ["setTimeout"] });
     const gallery = document.querySelector("[data-device-preview]");
     const play = gallery.querySelector("[data-device-play]");
     t.mock.timers.tick(10000);
     assert.equal(gallery.querySelector("[data-device-counter]").textContent, "01 / 03");
+    assert.ok(play.textContent.includes("Play slideshow"));
     click(play);
     assert.equal(play.getAttribute("aria-pressed"), "true");
-    t.mock.timers.tick(6500);
     assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    assert.ok(gallery.querySelector(".device-footnote").textContent.includes("slideshow playing"));
+    assert.ok(gallery.classList.contains("is-playing"));
+    assert.ok(gallery.querySelector(".device-progress > span"));
+    t.mock.timers.tick(3999);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    t.mock.timers.tick(1);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "03 / 03");
     click(play);
     assert.equal(play.getAttribute("aria-pressed"), "false");
+    assert.ok(gallery.querySelector(".device-footnote").textContent.includes("slideshow paused"));
+    assert.ok(!gallery.classList.contains("is-playing"));
     t.mock.timers.tick(13000);
-    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "03 / 03");
+    click(gallery.querySelector('[data-device-slide="0"]'));
+  });
+  await t.test("late toggle focus and moving the mouse over the mockup do not undo playback", (t) => {
+    t.mock.timers.enable({ apis: ["setTimeout"] });
+    const gallery = document.querySelector("[data-device-preview]");
+    const play = gallery.querySelector("[data-device-play]");
+    click(play);
+    play.dispatchEvent(new window.Event("focusin", { bubbles: true }));
+    const enter = new window.Event("pointerenter");
+    enter.pointerType = "mouse";
+    gallery.querySelector(".device-stage").dispatchEvent(enter);
+    assert.equal(play.getAttribute("aria-pressed"), "true");
+    t.mock.timers.tick(4000);
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "03 / 03");
+    click(play);
     click(gallery.querySelector('[data-device-slide="0"]'));
   });
   await t.test("global pause, reduced motion and hidden tabs stop the preview; arrows stay usable", (t) => {
@@ -145,9 +169,9 @@ test("product experience interactions", async (t) => {
     click(document.querySelector(".motion-toggle"));
     assert.ok(play.disabled);
     t.mock.timers.tick(7000);
-    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "01 / 03");
-    click(gallery.querySelector('[data-device-direction="1"]'));
     assert.equal(gallery.querySelector("[data-device-counter]").textContent, "02 / 03");
+    click(gallery.querySelector('[data-device-direction="1"]'));
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "03 / 03");
     click(document.querySelector(".motion-toggle"));
     const reduce = mediaQuery("(prefers-reduced-motion: reduce)");
     const change = (matches) => { reduce.matches = matches; reduce.listeners.forEach((listener) => listener({ matches })); };
@@ -181,7 +205,7 @@ test("product experience interactions", async (t) => {
     assert.equal(play.getAttribute("aria-pressed"), "false");
     click(document.querySelector("#finder-dialog .dialog-close"));
     t.mock.timers.tick(10000);
-    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "03 / 03");
+    assert.equal(gallery.querySelector("[data-device-counter]").textContent, "01 / 03");
     click(gallery.querySelector('[data-device-slide="0"]'));
   });
   await t.test("horizontal device swipes advance but vertical and cancelled gestures do not", () => {
