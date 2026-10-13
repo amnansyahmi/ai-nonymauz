@@ -2,8 +2,8 @@
 export const products = [
   {
     id: "people",
-    name: "Nonymauz People",
-    short: "People",
+    name: "HRMS",
+    short: "HRMS",
     category: "work",
     categoryLabel: "People & HR",
     icon: "users",
@@ -21,18 +21,18 @@ export const products = [
       "An HR workspace built around the day-to-day needs of Malaysian teams. Manage employee records, review requests, prepare payroll, and organise recruitment with role-based access.",
     note: "AI, email, payroll rules, and other services depend on workspace configuration. Payroll requires employer review.",
     url: "https://hrms-delta-sooty.vercel.app",
-    action: "Open People",
+    action: "Open HRMS",
     visual: "people",
   },
   {
-    id: "restu",
-    name: "Restu.ai",
-    short: "Restu.ai",
+    id: "wedding",
+    name: "Wedding Planner",
+    short: "Wedding Planner",
     category: "life",
     categoryLabel: "Wedding planning",
     icon: "heart",
     tone: "rose",
-    headline: "A little less stress.<br>A little more restu.",
+    headline: "A little less stress.<br>A little more joy.",
     description:
       "Keep your wedding checklist, budget, and vendor plans close. Plan your next chapter together.",
     features: [
@@ -44,14 +44,14 @@ export const products = [
     detail:
       "A wedding planning workspace for couples in Malaysia. Bring your tasks, costs, and vendor research into the same place, with an AI assistant for planning questions.",
     note: "Vendor information and official marriage requirements should be verified before making arrangements.",
-    url: "https://restu-ai.vercel.app",
-    action: "Open Restu.ai",
-    visual: "restu",
+    url: "/#start", privatePreview: true,
+    action: "Discuss this planner",
+    visual: "wedding",
   },
   {
-    id: "kretiv",
-    name: "KretivOS",
-    short: "KretivOS",
+    id: "studio",
+    name: "Creative Business Workspace",
+    short: "Creative Business Workspace",
     category: "work",
     categoryLabel: "Creative business",
     icon: "layers",
@@ -68,9 +68,9 @@ export const products = [
     detail:
       "A business workspace designed around a creative team. Follow a client from onboarding through proposals and delivery, keep brand assets and knowledge organised, and review work in an approval inbox.",
     note: "This is a business workspace. Access and connected services depend on the owning organisation’s setup.",
-    url: "https://kretivos.vercel.app",
-    action: "Open KretivOS",
-    visual: "kretiv",
+    url: "/#start", privatePreview: true,
+    action: "Discuss this workspace",
+    visual: "studio",
   },
   {
     id: "flow",
@@ -197,12 +197,12 @@ export const productPages = {
     screenshot: "/assets/products/people-desktop.webp",
     mobile: "/assets/products/people-mobile.webp",
   },
-  kretiv: {
+  studio: {
     number: "02",
     eyebrow: "Make space for the good ideas.",
     title: "From the first brief<br>to the final delivery.",
     audience: "For creative teams and independent studios",
-    demo: "kretiv",
+    demo: "studio",
     color: "#7758bd",
     summary:
       "Keep clients, projects, content, and feedback close. A shared workspace for the work behind the work.",
@@ -245,12 +245,12 @@ export const productPages = {
       ],
     ],
   },
-  restu: {
+  wedding: {
     number: "04",
     eyebrow: "Plan your next chapter.",
     title: "More together.<br>Less to remember.",
     audience: "For couples planning their wedding in Malaysia",
-    demo: "restu",
+    demo: "wedding",
     color: "#a35b68",
     summary:
       "The checklist, the budget, the vendor conversations. Give your wedding plans a place you can come back to together.",
@@ -342,4 +342,62 @@ export const productPages = {
     ],
   },
 };
+const additions = [
+  {
+    id: "potong", name: "potong.ai", short: "potong.ai", category: "tools",
+    categoryLabel: "Video clipping", icon: "scissors", tone: "lavender",
+    headline: "One video. More possibilities.",
+    description: "Turn long videos into vertical clips with subtitles, previews, and downloads.",
+    features: ["YouTube links & video uploads", "Vertical clips & subtitles", "Clip previews & captions", "MP4, SRT & ZIP downloads"],
+    detail: "A video clipping workflow for creators publishing to TikTok, Reels, and Shorts.",
+    note: "Processing needs an available video worker. Long videos may need a local worker; the current crop is centered.",
+    url: "https://potong-ai.vercel.app", action: "Open potong.ai",
+    title: "Long videos.<br>Short, useful moments.", audience: "For creators and content teams", color: "#7758bd",
+    steps: [["Bring a video", "Inspect a YouTube link or upload a video."], ["Shape the clips", "Choose clip length, format, and subtitle treatment."], ["Take them with you", "Preview and download clips, subtitles, and captions."]],
+  },
+  {
+    id: "marketplace", name: "Online Marketplace", short: "Marketplace", category: "work",
+    categoryLabel: "Online commerce", icon: "store", tone: "sand",
+    headline: "Give your products a home.",
+    description: "A commerce project bringing product browsing and sales operations into an online workspace.",
+    features: ["Product presentation", "Online shopping experience", "Sales workspace", "Business-specific setup"],
+    detail: "An online marketplace project for a product business.",
+    note: "The linked project currently presents a sales workspace. Storefront access, checkout, and payments depend on the business configuration.",
+    url: "https://chefammarproductdashboard.vercel.app", action: "Explore marketplace project",
+    title: "Products online.<br>Business in view.", audience: "For product businesses", color: "#a47536",
+    steps: [["Present your products", "Give the catalog a clear online starting point."], ["Explore the workspace", "Review the sales experience available in the current project."], ["Adapt for the business", "Discuss storefront, order, and payment requirements."]],
+  },
+  {
+    id: "openworld", name: "Openworld Kidzania", short: "Openworld", category: "games",
+    categoryLabel: "Career city · in development", icon: "map", tone: "blue",
+    headline: "A city full of possibilities.",
+    description: "Explore a family-friendly career-city game project, built around the original KidzCity concept.",
+    features: ["Career-city concept", "Unreal Engine foundation", "Browser streaming launcher", "Local development workflow"],
+    detail: "An evolving career-city project using Unreal Engine and a browser launcher.",
+    note: "In development. The repository provides a source foundation, not a finished playable city. Streaming requires a configured Unreal host. No affiliation with KidZania is implied.",
+    url: "https://openworld-kidzania.vercel.app", action: "Explore game project",
+    title: "Little explorers.<br>A bigger world.", audience: "For families exploring a career-city game concept", color: "#3455db",
+    steps: [["Discover the concept", "Explore a city built around careers and discovery."], ["Check the current build", "The launcher requires a configured game host."], ["Follow its development", "The complete playable city is still being authored."]],
+  },
+  {
+    id: "tiny-tots", name: "Tiny Tots", short: "Tiny Tots", category: "games",
+    categoryLabel: "Children’s learning games", icon: "gamepad", tone: "mint",
+    headline: "Small hands. Big discoveries.",
+    description: "A playful 3D room with letters, numbers, colors, shapes, stories, and creative activities.",
+    features: ["Letters, numbers & shapes", "Sorting & picture puzzles", "Stories & sketchpad", "Milo’s neighbourhood"],
+    detail: "A collection of learning games and creative activities in Milo’s 3D playroom.",
+    note: "Designed for play with a parent or caregiver. Sound and speech availability depend on the device and configuration.",
+    url: "https://tiny-tots.vercel.app", action: "Play Tiny Tots",
+    title: "Come play.<br>Keep discovering.", audience: "For curious little hands and their grown-ups", color: "#247c65",
+    steps: [["Meet Milo", "Look around the playroom and explore its toys."], ["Choose a game", "Try letters, counting, colors, stories, or puzzles."], ["Make something", "Draw on the sketchpad or explore the neighbourhood."]],
+  },
+];
+for (const [index, item] of additions.entries()) {
+  products.push(item);
+  productPages[item.id] = {
+    number: String(index + 8).padStart(2, "0"), eyebrow: item.headline,
+    title: item.title, audience: item.audience, color: item.color,
+    summary: item.description, steps: item.steps, demo: null,
+  };
+}
 export const productPath = (id) => `/systems/${id}/`;

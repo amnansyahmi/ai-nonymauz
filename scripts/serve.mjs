@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { resolve, extname, sep } from "node:path";
+import chatHandler from "../api/chat.js";
 const root = resolve(process.argv[2] || ".");
 const mime = {
   ".html": "text/html",
@@ -18,6 +19,7 @@ const mime = {
 createServer(async (req, res) => {
   try {
     const url = new URL(req.url, "http://localhost");
+    if (url.pathname === "/api/chat" || url.pathname === "/api/chat/") return await chatHandler(req, res);
     let file = resolve(root, `.${decodeURIComponent(url.pathname)}`);
     if (file !== root && !file.startsWith(root + sep)) {
       res.writeHead(403).end();

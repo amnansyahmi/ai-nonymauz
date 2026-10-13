@@ -8,7 +8,7 @@ Visitor progression: introduction → system directory → People device slidesh
 
 ## Device presentation
 
-The oversized screenshot gallery and “A little look inside” workspace section have been removed. The three large duplicate People/FlowTrack/KretivOS workspaces are no longer embedded in the landing page; all individual product pages retain their interactive demos.
+The oversized screenshot gallery and “A little look inside” workspace section have been removed. The three large duplicate People/FlowTrack/Creative Business Workspace workspaces are no longer embedded in the landing page; all individual product pages retain their interactive demos.
 
 People uses one reusable slideshow on the landing and People detail pages. Actual interface captures sit inside CSS laptop/phone silhouettes. Desktop shows the paired devices; mobile uses a small laptop behind the main phone. The fixed-height, clipped stage prevents tall screenshots from stretching the page. The leave slide contains only a phone because no matching desktop capture exists. The same image is never presented as a different device's interface.
 
@@ -26,7 +26,7 @@ Motion's locally bundled mini API animates device slide changes, dialogs and sec
 
 ## Product functionality
 
-Seven static product pages retain descriptions, feature lists, three-step workflows, interactive sample demos, current app destinations, availability notes and related products. Demo approvals, validated expenses and task movements work with fictional data. The system finder covers all seven systems and explains its recommendation. The project brief downloads locally and is not submitted.
+Seven static product pages retain descriptions, feature lists, three-step workflows, interactive sample demos, current app destinations, availability notes and related products. Demo approvals, validated expenses and task movements work with fictional data. The system finder covers all eleven systems and explains its recommendation. The project brief downloads locally and is not submitted.
 
 ## Integrity and accessibility
 

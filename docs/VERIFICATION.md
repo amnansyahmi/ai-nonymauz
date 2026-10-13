@@ -1,36 +1,13 @@
-# Verification — responsive device preview
+# Verification — portfolio and public chat
 
-## Completed
+13 October 2026.
 
-- JavaScript syntax checks and production build of home, seven product pages, sitemap and 404.
-- 37 automated tests passing with Node and Linkedom. DOM interaction tests execute the production app bundle; product demo fixtures come from generated product-page markup.
-- Checks cover:
-  - removal of the duplicate hero demo and oversized raw gallery; one home device presentation;
-  - arrow/dot wrapping, correct real image selection, and hiding the laptop on the phone-only leave slide;
-  - viewport-triggered autoplay, four-second advancement, progress/playing state and explicit pause persistence;
-  - late play-toggle focus and mouse hover do not undo playback; other focus/dialog suspension, resumption and manual interval resets;
-  - global pause/reduced motion, hidden tabs and offscreen suspension/resumption; explicit pause prevents automatic restart;
-  - secondary touch events preserve the primary gesture and permit playback to resume;
-  - keyboard controls and horizontal/vertical/cancelled touch-gesture intent;
-  - independent approvals/reset, expense totals/validation/HTML escaping, Kanban movement and counts;
-  - finder outcomes/back navigation, menu/filter state, dialog scroll restoration and downloaded brief;
-  - remaining Restu/operations/scripted chat/security demos;
-  - hero motion starts on touch without a canvas, idle callback or mouse event; viewport, pause, reduced motion, dialogs and back-navigation lifecycle;
-  - touch-generated arrow focus and gestures released outside the stage do not strand autoplay;
-  - local vector artwork, transparent assets, correct favicon/Apple icon dimensions and new branding on every generated page;
-  - locally resolving renderer bundle, generated landmarks/IDs/links/assets, product definitions and sitemap.
-- The real People source captures were visually inspected in the earlier capture work; this feedback's iPhone screenshot was inspected before redesign.
-- The user’s iPhone screenshots were inspected. The replacement SVG was rendered with resvg and visually inspected on the site background.
-- Responsive CSS constraints reviewed and git diff --check passes.
+- JavaScript syntax checks, production build and `git diff --check` passed.
+- 53 Node/Linkedom tests passed. Existing motion, slideshow, demos, finder, dialogs and brief download checks remain covered.
+- New tests exercise message/role validation, origin checks, credential isolation, quota denial/outage, provider errors, response usage settlement, Malaysian day/week boundaries, failed-input retry, safe text rendering, disabled chat, and anonymous public naming.
+- Chromium rendered home, chat, and the six new/renamed product routes at 320, 390, 768 and 1440px. No horizontal page overflow or page JavaScript errors were observed. Games filtering returned exactly two projects at each width.
+- Mobile and desktop chat screenshots, the mobile directory, and the creative workspace page were visually inspected. A stubbed mobile response rendered provider HTML as text with no injected image; New chat cleared the transcript.
+- The real local API returned 503 and a clear unavailable message with missing configuration. Production Redis/provider integration remains unverified: Vercel denied access to the project scope. The tests use a stubbed provider/Redis REST response, and do not establish live distributed-quota behavior.
+- The four added app destinations responded with HTTP 200. Openworld is labelled in development based on repository status; the sales project is presented under the requested Online Marketplace label.
 
-## Limits
-
-The supported control-browser skill is unavailable. No preview server, browser rendering or new browser screenshot was used. DOM simulation does not establish visual layout, touch-event delivery, Web Animations output or native dialog behaviour. Desktop/iPhone visual acceptance is outstanding.
-
-## Browser acceptance
-
-At 320, 390, 768 and 1440px, verify contained laptop/phone frames with no page overflow, legible controls and stable stage height between paired-device and phone-only slides. Confirm that no oversized gallery or “A little look inside” section remains. Check real captures sit within the frames and the tall dashboard scans inside the laptop only during requested playback.
-
-Scroll the preview into view: verify autoplay, a visible progress bar, playing status and screen changes every four seconds without clicking. Pause explicitly and verify it remains paused after leaving/re-entering the viewport or hiding/showing the tab. Resume with the toggle. Move the mouse over the mockup and verify playback continues. Test Safari click/focus ordering on the toggle. Use arrows, dots, keyboard and a horizontal swipe; a vertical swipe must scroll normally. Play/pause, interact with controls, focus the carousel, open a dialog, hide the tab, scroll offscreen and change reduced-motion preferences. Ensure temporary suspension resumes automatically, while an explicit user pause persists. Manual navigation remains available in both states. Check pause holds the current screenshot position, browser Back restores functional controls, and rapid changes do not leave blank/stale captures.
-
-Verify the crisp vector logo, automatic turn/float and orbit motion, individual product demos, menus, finder and brief download. The device preview is an animated slideshow of screenshots, not a live video recording.
+Browser checks used Chromium with emulated mobile sizes, not a physical iPhone or Safari. Chat activation requires the environment settings and a live smoke test described in [PUBLIC_CHAT.md](PUBLIC_CHAT.md).

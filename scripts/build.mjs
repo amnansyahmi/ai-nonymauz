@@ -3,6 +3,7 @@ import { products, productPages, productPath } from "../products.js";
 import { header, footer, dialogs, home, productPage } from "../lib/pages.js";
 import { escapeHTML } from "../lib/ui.js";
 import { build } from "esbuild";
+import { chatPage } from "../lib/chat-page.js";
 await rm("dist", { recursive: true, force: true });
 await mkdir("dist", { recursive: true });
 for (const file of [
@@ -12,6 +13,8 @@ for (const file of [
   "lib",
 ])
   await cp(file, `dist/${file}`, { recursive: true });
+for (const path of ["dist/assets/products/README.md", "dist/assets/brand/README.md"])
+  await rm(path, { force: true });
 // Bundle Motion and the lightweight hero lifecycle locally, without CDN calls.
 await build({
   entryPoints: ["app.js", "background.js"], outdir: "dist",
@@ -55,7 +58,9 @@ for (const p of products) {
     ),
   );
 }
-const urls = ["/", ...products.map((p) => productPath(p.id))];
+await mkdir("dist/chat", { recursive: true });
+await writeFile("dist/chat/index.html", render(chatPage(), "Chat — AI-Nonymauz", "Ask a question or explore your next idea with AI-Nonymauz.", "/chat/"));
+const urls = ["/", "/chat/", ...products.map((p) => productPath(p.id))];
 await writeFile(
   "dist/sitemap.xml",
   `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map((path) => `<url><loc>https://ai-nonymauz.my${path}</loc></url>`).join("")}</urlset>`,
@@ -73,4 +78,4 @@ await writeFile(
     "/",
   ),
 );
-console.log("Built home, seven product pages, sitemap, and 404 in dist/.");
+console.log(`Built home, chat, ${products.length} product pages, sitemap, and 404 in dist/.`);

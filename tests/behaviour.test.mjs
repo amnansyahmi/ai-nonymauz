@@ -39,16 +39,16 @@ test("expense input rejects invalid, negative, excessive, and malformed values",
   });
   assert.equal(parseExpense("Item", "1000000").amount, 1000000);
 });
-test("all seven goals map to the correct system with invalid combinations rejected", () => {
+test("all eleven goals map to the correct system with invalid combinations rejected", () => {
   const found = [];
   for (const [area, choices] of Object.entries(finderChoices))
     for (const [id] of choices) {
       assert.equal(recommendSystem(area, id), id);
       found.push(id);
     }
-  assert.equal(new Set(found).size, 7);
+  assert.equal(new Set(found).size, 11);
   assert.equal(recommendSystem("life", "people"), null);
-  assert.equal(recommendSystem("work", "restu"), null);
+  assert.equal(recommendSystem("work", "wedding"), null);
   assert.equal(recommendSystem("unknown", "cloud"), null);
 });
 test("demo text escapes user-provided HTML", () => {

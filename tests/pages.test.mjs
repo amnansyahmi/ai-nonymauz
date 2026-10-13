@@ -47,7 +47,7 @@ for (const route of routes)
     assert.ok(html.includes(`https://ai-nonymauz.my${route}`));
     assert.ok(html.includes('id="finder-dialog"'));
     assert.ok(html.includes('id="brief-dialog"'));
-    assert.ok(html.includes("Interactive demo"));
+    assert.ok(html.includes("Interactive demo") || html.includes("Project overview"));
     assert.ok(html.includes('/assets/brand/favicon.png'));
     assert.ok(html.includes('/assets/brand/apple-touch-icon.png'));
     assert.ok(html.includes('/assets/brand/ai-emblem.svg'));
@@ -58,12 +58,12 @@ test("every product has a complete page definition and an HTTPS app destination"
   for (const p of products) {
     assert.ok(productPages[p.id]);
     assert.equal(productPages[p.id].steps.length, 3);
-    assert.equal(new URL(p.url).protocol, "https:");
+    assert.equal(new URL(p.url, "https://ai-nonymauz.my").protocol, "https:");
   }
 });
-test("sitemap includes the home page and all seven products", async () => {
+test("sitemap includes the home page and all products and chat", async () => {
   const xml = await readFile("dist/sitemap.xml", "utf8");
-  assert.equal((xml.match(/<loc>/g) || []).length, 8);
+  assert.equal((xml.match(/<loc>/g) || []).length, products.length + 2);
   for (const route of routes)
     assert.ok(xml.includes(`https://ai-nonymauz.my${route}`));
 });

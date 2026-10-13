@@ -5,6 +5,7 @@ import { initialiseDevicePreviews } from "./lib/captures.js";
 import { initialiseTransitions, transitionIn } from "./lib/transitions.js";
 import { initialiseDemos } from "./lib/demos.js";
 import { finderChoices, recommendSystem } from "./lib/demo-state.js";
+import { initialiseChat } from "./lib/chat.js";
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 let paused = false;
@@ -14,6 +15,7 @@ if (products.some((p) => p.id === oldProduct))
 initialiseDemos();
 initialiseTransitions();
 initialiseDevicePreviews();
+initialiseChat();
 
 const menuButton = document.querySelector(".menu-button");
 const menu = document.querySelector("#mobile-nav");
@@ -112,7 +114,7 @@ function focusFinderHeading() {
 }
 function finderStart() {
   finderArea = "";
-  finderContent.innerHTML = `${progress(1)}<p class="overline">FIND YOUR EVERYDAY ADVANTAGE</p><h2 id="finder-title">What brings you here?</h2><p class="dialog-description">Two quick questions. A useful starting point.</p><div class="finder-options">${option("work", "Work & business", "Teams, clients, projects, and operations", "briefcase", "data-area")}${option("life", "Everyday life", "Your money and your next chapter", "heart", "data-area")}${option("tools", "AI & development", "Conversations, models, and integrations", "spark", "data-area")}</div><p class="form-note">No account needed. Your choices stay on this page.</p>`;
+  finderContent.innerHTML = `${progress(1)}<p class="overline">FIND YOUR EVERYDAY ADVANTAGE</p><h2 id="finder-title">What brings you here?</h2><p class="dialog-description">Two quick questions. A useful starting point.</p><div class="finder-options">${option("work", "Work & business", "Teams, clients, projects, and operations", "briefcase", "data-area")}${option("life", "Everyday life", "Your money and your next chapter", "heart", "data-area")}${option("tools", "AI & development", "Conversations, video, and integrations", "spark", "data-area")}${option("games", "Games", "Learning, play, and worlds to explore", "gamepad", "data-area")}</div><p class="form-note">No account needed. Your choices stay on this page.</p>`;
   focusFinderHeading();
 }
 function finderGoal(area) {
