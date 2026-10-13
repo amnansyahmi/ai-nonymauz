@@ -17,8 +17,9 @@ export function startRibbon({ paused = false } = {}) {
     host.style.removeProperty("--pointer-x");
     host.style.removeProperty("--pointer-y");
   };
-  const observer = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(([entry]) => {
-    visible = entry.isIntersecting;
+  const observer = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver((entries) => {
+    // Several crossings can be delivered together after a mobile scroll.
+    for (const entry of entries) if (entry.target === host) visible = entry.isIntersecting;
     update();
   });
   observer?.observe(host);

@@ -11,7 +11,7 @@ test("touch hero motion starts without WebGL, idle callbacks or mouse events", (
     constructor(callback) { this.callback = callback; observer = this; }
     observe(target) { this.target = target; }
     disconnect() { this.disconnected = true; }
-    emit(isIntersecting) { this.callback([{ isIntersecting }]); }
+    emit(isIntersecting) { this.callback([{ target: this.target, isIntersecting }]); }
   }
   Object.assign(globalThis, {
     document, window, IntersectionObserver: Observer,
@@ -27,6 +27,11 @@ test("touch hero motion starts without WebGL, idle callbacks or mouse events", (
   const host = document.querySelector('.hero-art');
   const dispose = startRibbon();
   assert.ok(!host.classList.contains('motion-idle'));
+  observer.callback([
+    { target: host, isIntersecting: false },
+    { target: host, isIntersecting: true },
+  ]);
+  assert.ok(!host.classList.contains('motion-idle'), 'latest visibility entry wins after rapid scrolling');
   observer.emit(false);
   assert.ok(host.classList.contains('motion-idle'));
   observer.emit(true);

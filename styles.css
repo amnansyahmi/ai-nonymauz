@@ -442,6 +442,7 @@ p {
   color: var(--blue);
 }
 .chip-work {
+  --chip-rotation: -5deg;
   left: 2%;
   top: 22%;
   transform: rotate(-5deg);
@@ -2161,10 +2162,10 @@ textarea::placeholder {
 @keyframes float {
   0%,
   100% {
-    translate: 0 0;
+    transform: translateY(0) rotate(var(--chip-rotation, 0deg));
   }
   50% {
-    translate: 0 -8px;
+    transform: translateY(-8px) rotate(var(--chip-rotation, 0deg));
   }
 }
 @keyframes task-enter {
@@ -3413,7 +3414,7 @@ html.motion-paused {
 .phone-homebar { position: absolute; width: 35%; height: 3px; left: 32.5%; bottom: 7px; border-radius: 2px; background: #b7c0cc; }
 .phone-screen { position: absolute; inset: 19px 6px 15px; min-height: 0; overflow: hidden; border-radius: 16px; background: #f1f5f3; }
 .phone-screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
-.device-stage[data-layout="phone"] .mockup-phone { right: 50%; transform: translateX(50%); }
+.device-stage[data-layout="phone"] .mockup-phone { --device-x: 50%; right: 50%; transform: translateX(50%); }
 .device-caption { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-top: 16px; }
 .device-caption .overline { font-size: 9px; color: var(--muted); }
 .device-caption h3 { font-size: clamp(21px, 2.5vw, 28px); font-weight: 500; line-height: 1.3; letter-spacing: -.7px; margin-top: 9px; }
@@ -3477,7 +3478,10 @@ html.motion-paused {
 .mockup-phone, .mockup-laptop { animation: device-hover 8s ease-in-out infinite; animation-play-state: paused; }
 .mockup-laptop { animation-delay: -3s; animation-duration: 10s; }
 .is-playing .mockup-phone, .is-playing .mockup-laptop { animation-play-state: running; }
-@keyframes device-hover { 0%, 100% { translate: 0 0; } 50% { translate: 0 -5px; } }
+@keyframes device-hover {
+  0%, 100% { transform: translate(var(--device-x, 0%), 0); }
+  50% { transform: translate(var(--device-x, 0%), -5px); }
+}
 @media (hover: hover) and (pointer: fine) {
   .system-row .system-arrow { transition: transform .3s ease; }
   .system-row:hover .system-arrow { transform: translate(3px, -3px); }
