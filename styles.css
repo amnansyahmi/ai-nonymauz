@@ -384,8 +384,9 @@ p {
 }
 /* Resolution-independent artwork, animated by the compositor on touch and desktop. */
 .hero-emblem { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; perspective: 1000px; }
-.hero-emblem-tilt { width: min(69%, 340px); transform: rotateX(var(--pointer-y, 0deg)) rotateY(var(--pointer-x, 0deg)); transition: transform .5s ease-out; }
-.hero-emblem-turn { animation: brand-turn 16s cubic-bezier(.45, 0, .25, 1) infinite; transform-style: preserve-3d; }
+.hero-emblem-tilt { width: min(55%, 290px); transform: rotateX(var(--pointer-y, 0deg)) rotateY(var(--pointer-x, 0deg)); transition: transform .5s ease-out; }
+.hero-emblem-turn { animation: brand-turn 12s linear infinite; transform-style: preserve-3d; }
+.hero-js-motion .hero-emblem-turn, .hero-js-motion .hero-emblem img { animation: none; }
 .hero-emblem img { display: block; width: 100%; height: auto; filter: drop-shadow(0 16px 16px #344cdc20); animation: brand-hover 6s ease-in-out infinite; }
 .art-orbit { animation: orbit-breathe 12s ease-in-out infinite; }
 .art-orbit::before, .art-orbit::after { content: ""; position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #536af0; box-shadow: 0 0 12px #536af040; }
@@ -399,9 +400,8 @@ p {
 .hero-copy > :nth-child(4) { animation-delay: .2s; }
 .hero-copy > :nth-child(5) { animation-delay: .26s; }
 @keyframes brand-turn {
-  0%, 12% { transform: rotateY(-12deg) rotateZ(-3deg); }
-  42%, 60% { transform: rotateY(16deg) rotateZ(2deg); }
-  88%, 100% { transform: rotateY(348deg) rotateZ(-3deg); }
+  from { transform: rotateY(0deg) rotateZ(-3deg); }
+  to { transform: rotateY(360deg) rotateZ(-3deg); }
 }
 @keyframes brand-hover { 0%, 100% { transform: translateY(5px); } 50% { transform: translateY(-8px); } }
 @keyframes brand-shadow { 0%, 100% { opacity: .8; transform: scaleX(1); } 50% { opacity: .4; transform: scaleX(.82); } }
@@ -2676,7 +2676,7 @@ textarea::placeholder {
   }
   .chip-life {
     right: 0;
-    bottom: 16%;
+    bottom: 9%;
   }
   .art-index {
     font-size: 9px;
