@@ -306,6 +306,56 @@ test("product experience interactions", async (t) => {
     click(play);
     click(gallery.querySelector('[data-device-slide="0"]'));
   });
+  await t.test("batched mobile visibility changes use the latest state", (t) => {
+    t.mock.timers.enable({ apis: ["setTimeout"] });
+    const gallery = document.querySelector("[data-device-preview]");
+    const play = gallery.querySelector('[data-device-play]');
+    const observer = previewObservers.find((item) => item.target === gallery);
+    click(play);
+    observer.callback([{ target: gallery, isIntersecting: false }, { target: gallery, isIntersecting: true }]);
+    assert.equal(play.getAttribute("aria-pressed"), "true");
+    const counter = gallery.querySelector('[data-device-counter]');
+    const before = counter.textContent;
+    t.mock.timers.tick(4000);
+    assert.notEqual(counter.textContent, before);
+    observer.callback([{ target: gallery, isIntersecting: true }, { target: gallery, isIntersecting: false }]);
+    assert.equal(play.getAttribute("aria-pressed"), "false");
+    const offscreen = counter.textContent;
+    t.mock.timers.tick(8000);
+    assert.equal(counter.textContent, offscreen);
+    previewVisibility(true);
+    click(play);
+    click(gallery.querySelector('[data-device-slide="0"]'));
+  });
+  await t.test("lost touch capture and cached back navigation recover autoplay", (t) => {
+    t.mock.timers.enable({ apis: ["setTimeout"] });
+    const gallery = document.querySelector("[data-device-preview]");
+    const stage = gallery.querySelector('.device-stage');
+    const play = gallery.querySelector('[data-device-play]');
+    click(play);
+    const down = new window.Event("pointerdown", { bubbles: true });
+    Object.assign(down, { pointerId: 7, clientX: 100, clientY: 100, button: 0 });
+    stage.dispatchEvent(down);
+    assert.equal(play.getAttribute("aria-pressed"), "false");
+    const lost = new window.Event("lostpointercapture"); lost.pointerId = 7;
+    stage.dispatchEvent(lost);
+    assert.equal(play.getAttribute("aria-pressed"), "true");
+    const hide = new window.Event("pagehide"); hide.persisted = true;
+    window.dispatchEvent(hide);
+    // A queued observer notification must not restart a suspended page.
+    previewVisibility(true);
+    assert.equal(play.getAttribute("aria-pressed"), "false");
+    const before = gallery.querySelector('[data-device-counter]').textContent;
+    t.mock.timers.tick(8000);
+    assert.equal(gallery.querySelector('[data-device-counter]').textContent, before);
+    const show = new window.Event("pageshow"); show.persisted = true;
+    window.dispatchEvent(show);
+    assert.equal(play.getAttribute("aria-pressed"), "true");
+    t.mock.timers.tick(4000);
+    assert.notEqual(gallery.querySelector('[data-device-counter]').textContent, before);
+    click(play);
+    click(gallery.querySelector('[data-device-slide="0"]'));
+  });
   await t.test("horizontal device swipes advance but vertical and cancelled gestures do not", () => {
     const gallery = document.querySelector("[data-device-preview]");
     const stage = gallery.querySelector(".device-stage");
