@@ -83,7 +83,7 @@ test("chat UI renders replies as text and resets the conversation", async () => 
   await initialiseChat(document, fetcher);
   const input = document.querySelector("textarea");
   input.value = "Hi"; input.dispatchEvent(new Event("input"));
-  document.querySelector("form").dispatchEvent(new Event("submit", { cancelable: true }));
+  document.querySelector("#live-chat-form").dispatchEvent(new Event("submit", { cancelable: true }));
   await new Promise(resolve => setTimeout(resolve, 0));
   assert.equal(document.querySelectorAll(".live-chat-message").length, 2);
   assert.equal(document.querySelector(".message-assistant img"), null);
@@ -102,7 +102,7 @@ test("chat UI retains failed input and excludes incomplete exchanges from retrie
     assert.deepEqual(JSON.parse(options.body).messages, [{ role: "user", content: "My question" }]);
     return calls === 1 ? json({ error: "Daily allowance reached" }, 429) : json({ reply: "Ready", remaining: 18 });
   });
-  const input = document.querySelector("textarea"), form = document.querySelector("form");
+  const input = document.querySelector("textarea"), form = document.querySelector("#live-chat-form");
   input.value = "My question"; input.dispatchEvent(new Event("input"));
   form.dispatchEvent(new Event("submit", { cancelable: true }));
   await new Promise(resolve => setTimeout(resolve, 0));

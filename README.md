@@ -52,3 +52,13 @@ Vercel uses the static build settings in `vercel.json`. All runtime assets, incl
 These systems have separate accounts and configurations. The landing page does not connect product accounts. Live public chat uses a guarded server-side API; see `docs/PUBLIC_CHAT.md` for setup, limits, and capacity estimates. See `docs/DESIGN.md`, `docs/VERIFICATION.md`, and `assets/products/README.md`.
 
 Live chat: `/chat/` uses `/api/chat`, with server-only credentials, persistent Redis quotas, a 1,000-message/day shared ceiling, a 100K daily token budget and a 20-message daily visitor allowance. Chat remains unavailable until configured. See [setup and capacity](docs/PUBLIC_CHAT.md).
+
+## Studio upgrades
+
+- Streaming public chat with the backend-reported model, safe Markdown, code/table formatting, Copy, Stop and Retry.
+- Public catalog comparisons and system recommendations; use a reply in a reviewable local project brief.
+- Eight small, local MP4 recordings of fictional HRMS, FlowTrack, Wedding Planner and Creative Workspace demos, with separate desktop/phone versions and still posters. Autoplay is muted and inline; playback pauses offscreen, during dialogs, in hidden tabs, on global pause, and for reduced-motion preferences.
+- Project-stage labels in the directory and detail pages, plus a dedicated Games showcase for Tiny Tots and Openworld.
+- No installable workspace, service worker, or stored conversation history is added.
+
+Activation and email delivery remain pending the real service configuration; the landing project currently has no environment variables. An email recipient has not been provided. The project brief remains a local download, with no false submission confirmation.

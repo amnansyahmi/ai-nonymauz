@@ -13,8 +13,17 @@ for (const id of ["people", "flow", "studio", "people"]) {
   wrapper.className = `test-${id}${document.querySelector(`.test-${id}`) ? "-second" : ""}`;
   wrapper.innerHTML = route.document.querySelector("[data-demo]").outerHTML;
   document.body.append(wrapper);
+  if (id === "people" && !document.querySelector("[data-device-preview]")) {
+    const captureFixture = document.createElement("section");
+    captureFixture.className = "test-product-captures";
+    captureFixture.innerHTML = route.document.querySelector("[data-device-preview]").outerHTML;
+    document.body.append(captureFixture);
+  }
 }
 
+for (const video of document.querySelectorAll("video")) {
+  video.pause = () => {}; video.play = async () => {}; video.load = () => {};
+}
 const previewObservers = [];
 class FakeIntersectionObserver {
   constructor(callback) { this.callback = callback; previewObservers.push(this); }
@@ -106,8 +115,10 @@ test("product experience interactions", async (t) => {
     click(first.querySelector("[data-reset]"));
     assert.equal(first.querySelector("[data-pending-count]").textContent, "2");
   });
-  await t.test("landing page has one device presentation and no oversized gallery or hero demo", () => {
-    assert.equal(document.querySelectorAll("[data-device-preview]").length, 1);
+  await t.test("landing page has one video presentation while product captures retain their own slideshow", () => {
+    assert.equal(document.querySelectorAll("#in-action [data-walkthrough]").length, 1);
+    assert.equal(document.querySelector("#in-action [data-device-preview]"), null);
+    assert.equal(document.querySelectorAll(".test-product-captures [data-device-preview]").length, 1);
     assert.equal(document.querySelector(".hero-showcase"), null);
     assert.equal(document.querySelector(".real-captures-section"), null);
     assert.equal(document.querySelector("[data-capture-gallery]"), null);

@@ -400,4 +400,14 @@ for (const [index, item] of additions.entries()) {
     summary: item.description, steps: item.steps, demo: null,
   };
 }
+const availability = {
+  people: ["available", "Available"], wedding: ["private", "Private preview"], studio: ["private", "Private preview"],
+  flow: ["available", "Available"], power: ["preview", "Preview"], cloud: ["setup", "Requires setup"],
+  secure: ["developer", "Developer project"], potong: ["preview", "Preview"], marketplace: ["preview", "Preview"],
+  openworld: ["development", "In development"], "tiny-tots": ["available", "Play now"],
+};
+for (const product of products) {
+  const [state, label] = availability[product.id];
+  product.availability = { state, label };
+}
 export const productPath = (id) => `/systems/${id}/`;

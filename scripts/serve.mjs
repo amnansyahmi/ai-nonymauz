@@ -4,6 +4,8 @@ import { resolve, extname, sep } from "node:path";
 import chatHandler from "../api/chat.js";
 const root = resolve(process.argv[2] || ".");
 const mime = {
+  ".mp4": "video/mp4",
+  ".webm": "video/webm",
   ".html": "text/html",
   ".css": "text/css",
   ".js": "text/javascript",
