@@ -16,7 +16,7 @@ Set these environment variables on the **ai-nonymauz landing-page project**, usi
 | `PUBLIC_CHAT_ALLOWED_ORIGINS` | Comma-separated exact allowed origins; production defaults to the apex and www domains |
 | `PUBLIC_CHAT_ENABLED` | `true` after the settings above are ready |
 
-Redeploy after setting variables. Missing settings or unavailable quota storage close chat safely; there is no in-memory fallback that resets on cold starts. GET `/api/chat` checks configuration readiness only; a successful real chat is needed to prove Redis and provider credentials work. The project connection can read Vercel settings. At the latest check (14 October), the landing-page project has no chat environment variables. The Marketplace CLI requires its own sign-in to provision Redis/email services; backend credentials still need setting in the landing project.
+Redeploy after setting variables. Missing settings or unavailable quota storage close chat safely; there is no in-memory fallback that resets on cold starts. GET `/api/chat` checks configuration readiness only; a successful real chat is needed to prove Redis and provider credentials work. The project connection can read Vercel settings. At the 14 October production check, the enable flag and backend settings were present, but the Redis REST URL, Redis write token and IP hash secret were missing. The Marketplace CLI requires its own sign-in to provision Redis/email services; backend credentials still need setting in the landing project.
 
 For local development use `node --env-file=.env.local scripts/serve.mjs dist` after building, and explicitly include `http://localhost:4173` in allowed origins. The static development server also runs the real handler. A preview needs its own exact origin added to its environment; it must not share production counters.
 
@@ -80,3 +80,7 @@ The browser requests `stream: true`. The Node handler converts upstream OpenAI S
 Replies use Marked's token lexer and a native DOM renderer for paragraphs, lists, tables, links and code. Provider HTML and images are displayed as text; no AI HTML is executed. Tables and code scroll horizontally within the reply. Copy, Stop and explicit Retry are available; partial replies stay visible but are excluded from later model history. Retry counts as a new admitted request.
 
 Public catalog comparisons run locally without using the chat allowance. The system finder recommends from the catalog. A reply can populate the existing project brief for review and download; that action does not send an enquiry. Email delivery has not been provisioned: a recipient address and authenticated email-service setup are still required. No enquiry is reported as sent.
+
+## Connection and composer
+
+The composer stays editable during connection checks or outages. Sending while disconnected retries the configuration check before any AI request; unsuccessful checks retain the draft and use no quota. Retry connection checks again without reloading. Checks time out after eight seconds. Enter adds a new line; Ctrl/Command + Enter sends. The initial view centers a compact composer with suggestions and collapsed catalog tools; conversations move the composer to the bottom.

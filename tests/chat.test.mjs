@@ -113,12 +113,32 @@ test("chat UI retains failed input and excludes incomplete exchanges from retrie
   await new Promise(resolve => setTimeout(resolve, 0));
   assert.equal(document.querySelectorAll(".live-chat-message").length, 2);
 });
-test("chat UI is clearly unavailable when configuration is missing", async () => {
-  const { document } = parseHTML(chatPage());
+test("unavailable chat stays editable and reconnects without losing a draft or calling the provider", async () => {
+  const { document, Event } = parseHTML(chatPage());
   await initialiseChat(document, async () => json({ available: false, error: "Chat is getting ready" }, 503));
-  assert.equal(document.querySelector("textarea").disabled, true);
+  assert.equal(document.querySelector("textarea").disabled, false);
   assert.equal(document.querySelector("[data-chat-send]").disabled, true);
-  assert.equal(document.querySelector("#live-chat-status").textContent, "Chat is getting ready");
+  assert.match(document.querySelector("#live-chat-status").textContent, /unavailable/);
+  document.querySelector('[data-chat-suggestion]').click();
+  assert.ok(document.querySelector('textarea').value.length > 0);
+  let connected = false, posts = 0;
+  // A fresh document exercises recovery after configuration changes without a reload.
+  const next = parseHTML(chatPage());
+  await initialiseChat(next.document, async (url, options) => {
+    if (options?.method === 'POST') { posts++; return json({reply:'Connected',remaining:19}); }
+    return connected ? json({available:true,visitorDailyLimit:20}) : json({available:false},503);
+  });
+  const input = next.document.querySelector('textarea'), form = next.document.querySelector('#live-chat-form');
+  input.value = 'Keep my draft'; input.dispatchEvent(new next.Event('input'));
+  form.dispatchEvent(new next.Event('submit', {cancelable:true}));
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(posts, 0); assert.equal(input.value, 'Keep my draft'); assert.equal(input.disabled, false);
+  connected = true; next.document.querySelector('[data-chat-connect]').click();
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(input.value, 'Keep my draft'); assert.equal(next.document.querySelector('[data-chat-connect]').hidden, true);
+  form.dispatchEvent(new next.Event('submit', {cancelable:true}));
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(posts, 1); assert.equal(next.document.querySelector('.message-assistant .chat-message-text').textContent, 'Connected');
 });
 test("generated public content contains no private product names or links", async () => {
   for (const route of ["", "chat/", "systems/wedding/", "systems/studio/"]) {
