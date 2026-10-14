@@ -56,7 +56,7 @@ test("successful chat sends only the bounded server policy and settles usage", a
     assert.equal(options.headers.Authorization, "Bearer private-redis-token");
     return json({ result: calls.length === 1 ? [1, 2] : 1 });
   } });
-  assert.equal(r.status, 200); assert.equal(r.body.remaining, 18); assert.equal(calls.length, 3);
+  assert.equal(r.status, 200); assert.equal(r.body.model, null, "Do not present the requested alias as a reported model"); assert.equal(r.body.remaining, 18); assert.equal(calls.length, 3);
   assert.equal(calls[2].payload.at(-2), 800); assert.equal(r.headers["Cache-Control"], "no-store");
   assert.ok(!JSON.stringify(r).includes("private-"));
 });

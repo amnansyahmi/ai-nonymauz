@@ -69,7 +69,7 @@ export function createChatHandler({ env = process.env, fetcher = fetch, clock = 
       const actual = Number.isSafeInteger(reported) && reported > 0 ? reported : reserved;
       try { await settle(config, quota.keys, window, reserved, actual, fetcher); }
       catch { /* Reservation remains charged if accounting is unavailable. Do not repeat the model call. */ }
-      return send(200, { reply: reply.trim().slice(0, 16000), remaining: Math.max(0, config.perVisitor - quota.value), model: typeof data.model === "string" ? data.model.slice(0, 120) : config.model, requestedModel: config.model });
+      return send(200, { reply: reply.trim().slice(0, 16000), remaining: Math.max(0, config.perVisitor - quota.value), model: typeof data.model === "string" ? data.model.slice(0, 120) : null, requestedModel: config.model });
     } catch {
       if (res.headersSent) { if (!res.destroyed) { res.write?.(`data: ${JSON.stringify({ type: "error", error: "The reply was interrupted. You can retry your message." })}\n\n`); res.end(); } return; }
       return send(503, { error: "The AI service took too long or is unavailable. Please try again later." }); }
@@ -81,7 +81,7 @@ async function streamReply(response, res, config, quota, window, reserved, fetch
   const emit = event => { if (!res.destroyed) res.write(`data: ${JSON.stringify(event)}\n\n`); };
   res.statusCode = 200; res.flushHeaders?.();
   emit({ type: "meta", requestedModel: config.model });
-  let model = config.model, text = "", usage, finished = false;
+  let model = "", text = "", usage, finished = false;
   for await (const raw of readSSE(response.body)) {
     if (res.destroyed) return;
     if (raw === "[DONE]") { finished = true; break; }
@@ -97,7 +97,7 @@ async function streamReply(response, res, config, quota, window, reserved, fetch
   }
   if (!finished || !text.trim()) throw new Error("Incomplete response stream");
   try { await settle(config, quota.keys, window, reserved, usage || reserved, fetcher); } catch { /* Keep reservation if accounting fails. */ }
-  emit({ type: "done", remaining: Math.max(0, config.perVisitor - quota.value), model, requestedModel: config.model });
+  emit({ type: "done", remaining: Math.max(0, config.perVisitor - quota.value), model: model || null, requestedModel: config.model });
   res.end();
 }
 export default createChatHandler();
