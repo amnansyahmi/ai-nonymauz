@@ -1,36 +1,19 @@
-# Verification — responsive device preview
+# Verification — studio upgrades
 
-## Completed
+14 October 2026.
 
-- JavaScript syntax checks and production build of home, seven product pages, sitemap and 404.
-- 37 automated tests passing with Node and Linkedom. DOM interaction tests execute the production app bundle; product demo fixtures come from generated product-page markup.
-- Checks cover:
-  - removal of the duplicate hero demo and oversized raw gallery; one home device presentation;
-  - arrow/dot wrapping, correct real image selection, and hiding the laptop on the phone-only leave slide;
-  - viewport-triggered autoplay, four-second advancement, progress/playing state and explicit pause persistence;
-  - late play-toggle focus and mouse hover do not undo playback; other focus/dialog suspension, resumption and manual interval resets;
-  - global pause/reduced motion, hidden tabs and offscreen suspension/resumption; explicit pause prevents automatic restart;
-  - secondary touch events preserve the primary gesture and permit playback to resume;
-  - keyboard controls and horizontal/vertical/cancelled touch-gesture intent;
-  - independent approvals/reset, expense totals/validation/HTML escaping, Kanban movement and counts;
-  - finder outcomes/back navigation, menu/filter state, dialog scroll restoration and downloaded brief;
-  - remaining Restu/operations/scripted chat/security demos;
-  - hero motion starts on touch without a canvas, idle callback or mouse event; viewport, pause, reduced motion, dialogs and back-navigation lifecycle;
-  - touch-generated arrow focus and gestures released outside the stage do not strand autoplay;
-  - local vector artwork, transparent assets, correct favicon/Apple icon dimensions and new branding on every generated page;
-  - locally resolving renderer bundle, generated landmarks/IDs/links/assets, product definitions and sitemap.
-- The real People source captures were visually inspected in the earlier capture work; this feedback's iPhone screenshot was inspected before redesign.
-- The user’s iPhone screenshots were inspected. The replacement SVG was rendered with resvg and visually inspected on the site background.
-- Responsive CSS constraints reviewed and git diff --check passes.
+- Syntax checks, production build, and `git diff --check` passed.
+- All 61 Node/Linkedom tests passed, including original motion/slideshow/demo checks and new streaming, Markdown, public comparison and recording checks.
+- Chromium rendered home, chat, and six changed/new product routes at 320, 390, 768 and 1440px without horizontal page overflow or page JavaScript errors. Games filtering returned exactly two projects at each width.
+- Eight desktop/phone demo recordings and their posters were generated from actual interactions in the site's fictional workspaces. Each MP4 is under 40KB; video and poster assets total approximately 364KB on disk.
+- On a mobile Chromium viewport, both video elements were muted, inline, playing, and had advancing current time. Explicit pause survived leaving/re-entering the viewport; selecting FlowTrack loaded its own recordings.
+- Browser → real Node API handler → fixture upstream/Redis → streamed browser reply was verified locally. The backend-reported model appeared, Markdown table/code rendered, provider HTML stayed text, usage settlement was called, Retry produced one replacement reply, and Use in project brief populated the native dialog. A catalog comparison added no extra provider request. There were no page JavaScript errors.
+- The production landing project contained nine backend/chat settings; Redis REST URL/token and the IP hash secret were missing. Actual Redis/provider credentials have not been connected; distributed quota behavior and production chat remain unverified. Local integration used a fixture provider/Redis REST response, not real production services.
+- Email delivery is not implemented or provisioned yet. The Marketplace CLI required login and no enquiry recipient was provided. The existing project brief remains a local review/download flow, with no false submission confirmation.
+- No installable workspace, service worker or persistent conversation history was added.
 
-## Limits
+Checks used Chromium mobile emulation, not physical iPhone/Safari testing. Live activation and email delivery need the pending account/configuration steps in [PUBLIC_CHAT.md](PUBLIC_CHAT.md).
 
-The supported control-browser skill is unavailable. No preview server, browser rendering or new browser screenshot was used. DOM simulation does not establish visual layout, touch-event delivery, Web Animations output or native dialog behaviour. Desktop/iPhone visual acceptance is outstanding.
+## Minimal chat and connection recovery
 
-## Browser acceptance
-
-At 320, 390, 768 and 1440px, verify contained laptop/phone frames with no page overflow, legible controls and stable stage height between paired-device and phone-only slides. Confirm that no oversized gallery or “A little look inside” section remains. Check real captures sit within the frames and the tall dashboard scans inside the laptop only during requested playback.
-
-Scroll the preview into view: verify autoplay, a visible progress bar, playing status and screen changes every four seconds without clicking. Pause explicitly and verify it remains paused after leaving/re-entering the viewport or hiding/showing the tab. Resume with the toggle. Move the mouse over the mockup and verify playback continues. Test Safari click/focus ordering on the toggle. Use arrows, dots, keyboard and a horizontal swipe; a vertical swipe must scroll normally. Play/pause, interact with controls, focus the carousel, open a dialog, hide the tab, scroll offscreen and change reduced-motion preferences. Ensure temporary suspension resumes automatically, while an explicit user pause persists. Manual navigation remains available in both states. Check pause holds the current screenshot position, browser Back restores functional controls, and rapid changes do not leave blank/stale captures.
-
-Verify the crisp vector logo, automatic turn/float and orbit motion, individual product demos, menus, finder and brief download. The device preview is an animated slideshow of screenshots, not a live video recording.
+The composer stays editable when unavailable and keeps its draft after unsuccessful connection checks. The initial page uses a centered prompt, compact expanding composer, quiet suggestions and collapsed catalog tools; conversation mode anchors the composer below replies. Availability checks time out after eight seconds and can be retried explicitly. All 61 tests passed, including outage → draft → failed send with no provider request → reconnection → successful send. Chromium checked that flow, formatted replies, tools dialog and reset at 320/390/768/1440px with no overflow or page errors. The browser recovery responses were fixtures; the production API still returned unavailable because the three required settings were missing.

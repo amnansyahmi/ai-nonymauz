@@ -1,6 +1,6 @@
 # AI-Nonymauz
 
-A static product experience for People, KretivOS, PowerOS, Restu.ai, FlowTrack, AI-Nonymauz Cloud, and SecureIntelligence.
+A product experience for HRMS, Creative Business Workspace, Wedding Planner, FlowTrack, PowerOS, AI-Nonymauz Cloud, SecureIntelligence, potong.ai, Online Marketplace, Openworld Kidzania, and Tiny Tots.
 
 ## Develop
 
@@ -28,9 +28,9 @@ Vercel uses the static build settings in `vercel.json`. All runtime assets, incl
 - One compact People device slideshow on the home and product pages, using genuine captures inside phone/laptop frames. Arrows, dots, keyboard and horizontal swipes switch slides; The slideshow autoplays when visible and switches screens every four seconds, with a progress bar and playing/paused text; desktop captures also scan within the frame.
 - Motion transitions for device slides, dialogs and section entries, with native scrolling and reduced-motion support. The landing page does not include duplicate full-size workspaces.
 - Working approvals, validated expense entry and budget recalculation, and task movement via buttons or drag and drop. All use fictional demo data.
-- Smaller interactive concepts for Restu.ai, PowerOS, AI Cloud, and SecureIntelligence. AI replies are explicitly scripted, and the security demo does not scan anything.
+- Smaller interactive concepts for Wedding Planner, PowerOS, AI Cloud, and SecureIntelligence. AI replies are explicitly scripted, and the security demo does not scan anything.
 - Motion pause/reduced-motion support. Playback suspends for focus, gestures, dialogs, hidden tabs and offscreen previews, then resumes when appropriate. An explicit Pause remains paused until the user resumes it.
-- A filterable directory and seven static, shareable `/systems/{id}/` product pages with unique metadata, a sitemap, and a 404 page. Legacy `?system=...` links redirect to the corresponding page.
+- A filterable directory and eleven static, shareable `/systems/{id}/` product pages with unique metadata, a sitemap, and a 404 page. Legacy `?system=...` links redirect to the corresponding page.
 - A two-question system finder with an explained recommendation, back navigation, and app/product links.
 - Native modal dialogs with focus restoration, phone bottom-sheet styling, drag-handle dismissal, and background scroll locking.
 - A browser-local project-brief Markdown download, including goal, audience, timeline, and optional budget.
@@ -49,4 +49,16 @@ Vercel uses the static build settings in `vercel.json`. All runtime assets, incl
 - `scripts/build.mjs`: static pages, metadata, sitemap, assets.
 - `tests/`: state, DOM interaction, motion lifecycle and generated-page checks.
 
-These systems have separate accounts and configurations. The landing page does not connect accounts or call backend AI APIs. See `docs/DESIGN.md`, `docs/VERIFICATION.md`, and `assets/products/README.md`.
+These systems have separate accounts and configurations. The landing page does not connect product accounts. Live public chat uses a guarded server-side API; see `docs/PUBLIC_CHAT.md` for setup, limits, and capacity estimates. See `docs/DESIGN.md`, `docs/VERIFICATION.md`, and `assets/products/README.md`.
+
+Live chat: `/chat/` uses `/api/chat`, with server-only credentials, persistent Redis quotas, a 1,000-message/day shared ceiling, a 100K daily token budget and a 20-message daily visitor allowance. Chat remains unavailable until configured. See [setup and capacity](docs/PUBLIC_CHAT.md).
+
+## Studio upgrades
+
+- Streaming public chat with the backend-reported model, safe Markdown, code/table formatting, Copy, Stop and Retry.
+- Public catalog comparisons and system recommendations; use a reply in a reviewable local project brief.
+- Eight small, local MP4 recordings of fictional HRMS, FlowTrack, Wedding Planner and Creative Workspace demos, with separate desktop/phone versions and still posters. Autoplay is muted and inline; playback pauses offscreen, during dialogs, in hidden tabs, on global pause, and for reduced-motion preferences.
+- Project-stage labels in the directory and detail pages, plus a dedicated Games showcase for Tiny Tots and Openworld.
+- No installable workspace, service worker, or stored conversation history is added.
+
+Activation and email delivery remain pending the real service configuration; the landing project currently has no environment variables. An email recipient has not been provided. The project brief remains a local download, with no false submission confirmation.

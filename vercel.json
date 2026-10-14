@@ -25,5 +25,22 @@
     }
   ],
   "cleanUrls": true,
-  "trailingSlash": true
+  "trailingSlash": true,
+  "functions": {
+    "api/chat.js": {
+      "maxDuration": 60
+    }
+  },
+  "redirects": [
+    {
+      "source": "/systems/restu/:path*",
+      "destination": "/systems/wedding/",
+      "permanent": true
+    },
+    {
+      "source": "/systems/kretiv/:path*",
+      "destination": "/systems/studio/",
+      "permanent": true
+    }
+  ]
 }

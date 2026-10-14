@@ -18,6 +18,7 @@
     "linkedom": "^0.18.12"
   },
   "dependencies": {
+    "marked": "^18.1.1",
     "motion": "^14.1.0"
   }
 }

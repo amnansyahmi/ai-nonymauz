@@ -7,14 +7,23 @@ const { window } = parseHTML(
   await readFile(new URL("../dist/index.html", import.meta.url), "utf8"),
 );
 const { document } = window;
-for (const id of ["people", "flow", "kretiv", "people"]) {
+for (const id of ["people", "flow", "studio", "people"]) {
   const route = parseHTML(await readFile(new URL(`../dist/systems/${id}/index.html`, import.meta.url), "utf8"));
   const wrapper = document.createElement("section");
   wrapper.className = `test-${id}${document.querySelector(`.test-${id}`) ? "-second" : ""}`;
   wrapper.innerHTML = route.document.querySelector("[data-demo]").outerHTML;
   document.body.append(wrapper);
+  if (id === "people" && !document.querySelector("[data-device-preview]")) {
+    const captureFixture = document.createElement("section");
+    captureFixture.className = "test-product-captures";
+    captureFixture.innerHTML = route.document.querySelector("[data-device-preview]").outerHTML;
+    document.body.append(captureFixture);
+  }
 }
 
+for (const video of document.querySelectorAll("video")) {
+  video.pause = () => {}; video.play = async () => {}; video.load = () => {};
+}
 const previewObservers = [];
 class FakeIntersectionObserver {
   constructor(callback) { this.callback = callback; previewObservers.push(this); }
@@ -106,8 +115,10 @@ test("product experience interactions", async (t) => {
     click(first.querySelector("[data-reset]"));
     assert.equal(first.querySelector("[data-pending-count]").textContent, "2");
   });
-  await t.test("landing page has one device presentation and no oversized gallery or hero demo", () => {
-    assert.equal(document.querySelectorAll("[data-device-preview]").length, 1);
+  await t.test("landing page has one video presentation while product captures retain their own slideshow", () => {
+    assert.equal(document.querySelectorAll("#in-action [data-walkthrough]").length, 1);
+    assert.equal(document.querySelector("#in-action [data-device-preview]"), null);
+    assert.equal(document.querySelectorAll(".test-product-captures [data-device-preview]").length, 1);
     assert.equal(document.querySelector(".hero-showcase"), null);
     assert.equal(document.querySelector(".real-captures-section"), null);
     assert.equal(document.querySelector("[data-capture-gallery]"), null);
@@ -415,7 +426,7 @@ test("product experience interactions", async (t) => {
   await t.test(
     "tasks move across the board with counts and final state updated",
     () => {
-      const app = document.querySelector(".test-kretiv [data-demo]");
+      const app = document.querySelector(".test-studio [data-demo]");
       const task = app.querySelector('[data-task="brief"]');
       click(task.querySelector("button"));
       assert.equal(task.parentElement.dataset.stage, "1");
@@ -435,12 +446,13 @@ test("product experience interactions", async (t) => {
     },
   );
   await t.test(
-    "finder covers all seven recommendations and restores scroll on close",
+    "finder covers all eleven recommendations and restores scroll on close",
     () => {
       const goals = {
-        work: ["people", "kretiv", "power"],
-        life: ["restu", "flow"],
-        tools: ["cloud", "secure"],
+        work: ["people", "studio", "power", "marketplace"],
+        life: ["wedding", "flow"],
+        tools: ["cloud", "secure", "potong"],
+        games: ["openworld", "tiny-tots"],
       };
       for (const [area, ids] of Object.entries(goals))
         for (const id of ids) {
@@ -481,7 +493,7 @@ test("product experience interactions", async (t) => {
         [...document.querySelectorAll("[data-category]")].filter(
           (x) => !x.hidden,
         ).length,
-        7,
+        11,
       );
       click(document.querySelector(".menu-button"));
       assert.equal(
@@ -552,18 +564,18 @@ test("additional product demos respond and reset", async () => {
   const { demoShell } = await import("../lib/demo-views.js");
   const { initialiseDemos } = await import("../lib/demos.js");
   const root = document.createElement("div");
-  root.innerHTML = ["restu", "power", "cloud", "secure"]
+  root.innerHTML = ["wedding", "power", "cloud", "secure"]
     .map((id) => demoShell(id))
     .join("");
   document.body.append(root);
   initialiseDemos(root);
-  const restu = root.querySelector('[data-demo="restu"]');
-  const check = restu.querySelectorAll("input")[1];
+  const wedding = root.querySelector('[data-demo="wedding"]');
+  const check = wedding.querySelectorAll("input")[1];
   check.checked = true;
   check.setAttribute("checked", "");
   check.dispatchEvent(new window.Event("change", { bubbles: true }));
   assert.equal(
-    restu.querySelector(".checklist-progress").textContent,
+    wedding.querySelector(".checklist-progress").textContent,
     "2 of 3 steps complete",
   );
   const power = root.querySelector('[data-demo="power"]');

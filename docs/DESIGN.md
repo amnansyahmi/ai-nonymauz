@@ -8,7 +8,7 @@ Visitor progression: introduction → system directory → People device slidesh
 
 ## Device presentation
 
-The oversized screenshot gallery and “A little look inside” workspace section have been removed. The three large duplicate People/FlowTrack/KretivOS workspaces are no longer embedded in the landing page; all individual product pages retain their interactive demos.
+The oversized screenshot gallery and “A little look inside” workspace section have been removed. The three large duplicate People/FlowTrack/Creative Business Workspace workspaces are no longer embedded in the landing page; all individual product pages retain their interactive demos.
 
 People uses one reusable slideshow on the landing and People detail pages. Actual interface captures sit inside CSS laptop/phone silhouettes. Desktop shows the paired devices; mobile uses a small laptop behind the main phone. The fixed-height, clipped stage prevents tall screenshots from stretching the page. The leave slide contains only a phone because no matching desktop capture exists. The same image is never presented as a different device's interface.
 
@@ -26,10 +26,20 @@ Motion's locally bundled mini API animates device slide changes, dialogs and sec
 
 ## Product functionality
 
-Seven static product pages retain descriptions, feature lists, three-step workflows, interactive sample demos, current app destinations, availability notes and related products. Demo approvals, validated expenses and task movements work with fictional data. The system finder covers all seven systems and explains its recommendation. The project brief downloads locally and is not submitted.
+Eleven static product pages retain descriptions, feature lists, three-step workflows, interactive sample demos, current app destinations, availability notes and related products. Demo approvals, validated expenses and task movements work with fictional data. The system finder covers all eleven systems and explains its recommendation. The project brief downloads locally and is not submitted.
 
 ## Integrity and accessibility
 
 No invented customers, testimonials, adoption metrics, shared-account claims, prices or integrations. Cloud demo replies are scripted and security steps are illustrative. Device previews use sample captures and separately captured device sessions. Screenshots are not claims that the current live deployment was inspected.
 
 Semantic landmarks, one H1 per page, native links/buttons, visible focus, labelled controls and keyboard alternatives to gestures. Device controls have 44px targets. Native dialogs retain focus restoration, phone bottom-sheet styling and background scroll locking. Essential content is independent of animation support.
+
+## Product recordings and Games
+
+The home page uses one selectable recording presentation instead of the former screenshot slideshow. Four product workflows have separate desktop and phone recordings, captured from the site's interactive fictional demos. They are labelled demo recordings, not live app sessions. Each MP4 is under 40 KB; posters are local WebP files. Screens remain inside compact laptop and phone frames, with product selection, chapter navigation and explicit play/pause. Lazy media loading, visibility checks and reduced-motion/static posters limit mobile work. Existing genuine HRMS screenshot captures remain available on its product page.
+
+Availability labels describe the project stage, not a live uptime test. A dedicated Games section uses lightweight CSS illustrations for Tiny Tots and the in-development career-city concept.
+
+## Chat workspace
+
+A single responsive chat page offers streaming text, the backend-reported model, safe native Markdown nodes, bounded code/table scrolling and Copy/Stop/Retry. Catalog comparisons and the system finder work independently of model availability. Preparing a brief opens the existing local review/download form. Email delivery awaits service provisioning and a verified destination. No installable workspace or persistent chat history is introduced.
