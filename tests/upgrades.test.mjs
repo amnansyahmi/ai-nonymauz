@@ -7,7 +7,7 @@ import { readSSE } from '../server/sse.js';
 import { renderMarkdown } from '../lib/markdown.js';
 import { initialiseChat } from '../lib/chat.js';
 import { chatPage } from '../lib/chat-page.js';
-import { walkthroughShowcase, initialiseWalkthroughs } from '../lib/walkthroughs.js';
+import { walkthroughShowcase, initialiseWalkthroughs, walkthroughs, chapterStart, chapterAt } from '../lib/walkthroughs.js';
 import { readFile, stat } from 'node:fs/promises';
 
 const env = { PUBLIC_CHAT_ENABLED:'true', AI_NONYMAUZ_CHAT_URL:'https://backend.example/v1/chat/completions', AI_NONYMAUZ_API_KEY:'secret', UPSTASH_REDIS_REST_URL:'https://redis.example', UPSTASH_REDIS_REST_TOKEN:'redis-secret', CHAT_IP_HASH_SECRET:'hash-secret', VERCEL:'1' };
@@ -74,7 +74,21 @@ test('walkthrough playback is inline, pauses offscreen and preserves manual paus
  document.querySelector('[data-walkthrough-product="flow"]').click();await tick();assert.ok(videos.every(video=>video.src.includes('/flow-')));
 });
 test('all demo recordings are small local MP4 files and posters exist',async()=>{
+ // HyperFrames renders are 10 s and retina-sharp, so they get a larger per-file budget; the set stays capped.
+ let total=0;
  for(const id of ['people','flow','wedding','studio'])for(const kind of ['desktop','mobile']){
-  const p=`assets/walkthroughs/${id}-${kind}.mp4`,data=await readFile(p);assert.ok(data.subarray(0,24).includes(Buffer.from('ftyp')));assert.ok((await stat(p)).size<100000);assert.ok((await stat(`assets/walkthroughs/${id}-${kind}.webp`)).size>1000);
+  const p=`assets/walkthroughs/${id}-${kind}.mp4`,data=await readFile(p),size=(await stat(p)).size;total+=size;
+  assert.ok(data.subarray(0,24).includes(Buffer.from('ftyp')));assert.ok(size<160000,`${p} is ${size} bytes`);assert.ok((await stat(`assets/walkthroughs/${id}-${kind}.webp`)).size>1000);
  }
+ assert.ok(total<600000,`recordings total ${total} bytes`);
+});
+test('HRMS chapter buttons seek to the rendered story chapter times',async()=>{
+ const {people}=await import('../video/stories/people.mjs');
+ const entry=walkthroughs.find(x=>x.id==='people');
+ assert.deepEqual(entry.chapters,people.chapters.map(c=>c.title));
+ assert.deepEqual(entry.times,people.chapters.map(c=>c.start));
+ assert.equal(chapterStart(entry,1,people.duration),2.8);
+ assert.equal(chapterAt(entry,2.79,people.duration),0);assert.equal(chapterAt(entry,5.6,people.duration),2);
+ const flow=walkthroughs.find(x=>x.id==='flow');
+ assert.equal(chapterStart(flow,2,6),4);assert.equal(chapterAt(flow,3.9,6),1);assert.equal(chapterAt(flow,1,NaN),0);
 });
