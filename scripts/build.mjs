@@ -7,7 +7,6 @@ import { chatPage } from "../lib/chat-page.js";
 await rm("dist", { recursive: true, force: true });
 await mkdir("dist", { recursive: true });
 for (const file of [
-  "styles.css",
   "products.js",
   "assets",
   "lib",
@@ -20,6 +19,11 @@ await build({
   entryPoints: ["app.js", "background.js"], outdir: "dist",
   bundle: true, splitting: true, format: "esm", minify: true, target: "es2022",
   legalComments: "linked",
+});
+// Minify the stylesheet; root-relative asset URLs stay as written.
+await build({
+  entryPoints: ["styles.css"], outfile: "dist/styles.css",
+  bundle: true, minify: true, external: ["/assets/*"], logLevel: "warning",
 });
 const template = await readFile("index.html", "utf8");
 const render = (main, title, description, path) =>

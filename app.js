@@ -6,7 +6,6 @@ import { initialiseTransitions, transitionIn } from "./lib/transitions.js";
 import { initialiseDemos } from "./lib/demos.js";
 import { finderChoices, recommendSystem } from "./lib/demo-state.js";
 import { initialiseWalkthroughs } from "./lib/walkthroughs.js";
-import { initialiseChat } from "./lib/chat.js";
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 let paused = false;
@@ -17,7 +16,14 @@ initialiseDemos();
 initialiseTransitions();
 initialiseDevicePreviews();
 initialiseWalkthroughs();
-initialiseChat();
+// The chat module carries the Markdown parser, so only the chat page downloads it.
+if (document.querySelector("#live-chat-form"))
+  import("./lib/chat.js")
+    .then(({ initialiseChat }) => initialiseChat())
+    .catch(() => {
+      const error = document.querySelector("#live-chat-error");
+      if (error) error.textContent = "Chat could not load. Refresh the page to try again.";
+    });
 
 const menuButton = document.querySelector(".menu-button");
 const menu = document.querySelector("#mobile-nav");

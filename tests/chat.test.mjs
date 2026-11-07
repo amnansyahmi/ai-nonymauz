@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { parseHTML } from "linkedom";
 import { createChatHandler } from "../api/chat.js";
 import { validateMessages, configuration, quotaWindow, visitorKey } from "../server/chat-policy.js";
@@ -146,6 +146,9 @@ test("generated public content contains no private product names or links", asyn
     assert.ok(!/KretivOS|Restu\.ai|restu-ai|kretivos|\/systems\/(restu|kretiv)/i.test(html));
     assert.equal((html.match(/<h1\b/g) || []).length, 1);
   }
-  const js = await readFile("dist/app.js", "utf8");
-  assert.ok(!/private-backend-key|private-redis-token|AI_NONYMAUZ_API_KEY|UPSTASH_REDIS_REST_TOKEN|KretivOS|Restu\.ai/i.test(js));
+  // The chat code is split into a lazy chunk, so scan every shipped script.
+  for (const file of (await readdir("dist")).filter(name => name.endsWith(".js"))) {
+    const js = await readFile(`dist/${file}`, "utf8");
+    assert.ok(!/private-backend-key|private-redis-token|AI_NONYMAUZ_API_KEY|UPSTASH_REDIS_REST_TOKEN|KretivOS|Restu\.ai/i.test(js), file);
+  }
 });
