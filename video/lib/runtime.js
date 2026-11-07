@@ -5,6 +5,12 @@
   function create({ scale, width, height, input }) {
     const cam = document.querySelector("[data-cam]");
     const layer = document.querySelector("[data-fx]");
+    const frame = document.querySelector(".frame"), card = frame.firstElementChild;
+    // Pin the card's top edge: centred when it fits, 16px from the top when it is taller
+    // than the screen. Anything that grows later then extends downwards only.
+    frame.style.paddingTop = `${Math.max(16, Math.round((height / scale - card.offsetHeight) / 2))}px`;
+    // Effects sit outside the card, so give them the product's accent colour.
+    layer.style.setProperty("--demo-accent", getComputedStyle(card).getPropertyValue("--demo-accent").trim() || "#3455db");
     gsap.set(cam, { x: 0, y: 0, scale, transformOrigin: "0 0" });
     const camBox = cam.getBoundingClientRect();
 
@@ -26,12 +32,18 @@
       return { x, y, w: r - x, h: btm - y, cx: (x + r) / 2, cy: (y + btm) / 2 };
     }
 
-    // Camera: zoom 1 shows the whole frame; higher values push in on a point.
+    // Camera: zoom 1 with no point shows the screen as composed; otherwise it centres on the
+    // point without showing past the screen or (for a tall card) past the card plus a margin.
+    const cardBox = box(card);
+    const extent = {
+      left: 0, top: 0, right: width / scale,
+      bottom: Math.max(height / scale, cardBox.y + cardBox.h + 16),
+    };
     function focus(tl, point, zoom, at, duration = 1, ease = "power3.inOut") {
       const s = scale * zoom;
-      const clamp = (value, min) => Math.min(0, Math.max(min, value));
-      const x = point ? clamp(width / 2 - point.cx * s, width - width * zoom) : 0;
-      const y = point ? clamp(height / 2 - point.cy * s, height - height * zoom) : 0;
+      const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
+      const x = point ? clamp(width / 2 - point.cx * s, width - extent.right * s, -extent.left * s) : 0;
+      const y = point ? clamp(height / 2 - point.cy * s, height - extent.bottom * s, -extent.top * s) : 0;
       tl.to(cam, { x, y, scale: s, duration, ease }, at);
     }
 
@@ -66,7 +78,7 @@
         .to(b.el, { scale: 1, duration: 0.2, ease: "power2.out" }, at + 0.1)
         .set(ripple, { opacity: 0.32 }, at + 0.04)
         .to(ripple, { scale: 1.6, opacity: 0, duration: 0.55, ease: "power2.out" }, at + 0.04);
-      if (input === "touch") tl.to(pointer, { opacity: 0, duration: 0.3 }, at + 0.32);
+      if (input === "touch") tl.to(pointer, { opacity: 0, duration: 0.2 }, at + 0.2);
     }
 
     // A soft outline that draws attention to an area without covering it.
@@ -79,11 +91,49 @@
       tl.to(ring, { opacity: 1, duration: 0.3 }, at).to(ring, { opacity: 0, duration: 0.4 }, at + duration);
     }
 
+    // Typing into a field: a focused overlay over the input shows the text growing letter by
+    // letter with a caret. Returns the time typing finishes and the overlay, for clearing later.
+    function type(tl, target, text, at, perSecond = 16) {
+      const b = box(target), style = getComputedStyle(b.el);
+      const field = document.createElement("div");
+      field.className = "fx-field";
+      Object.assign(field.style, {
+        width: `${b.w}px`, height: `${b.h}px`, fontSize: style.fontSize, color: style.color,
+        paddingLeft: style.paddingLeft, borderRadius: style.borderRadius, borderColor: style.borderTopColor,
+      });
+      const ring = document.createElement("span");
+      ring.className = "fx-focus";
+      field.append(ring);
+      layer.append(field);
+      gsap.set(field, { x: b.x, y: b.y, opacity: 0 });
+      const steps = [...text].map((_, i) => {
+        const step = document.createElement("span");
+        step.className = "fx-typed";
+        step.textContent = text.slice(0, i + 1);
+        field.append(step);
+        gsap.set(step, { opacity: 0 });
+        return step;
+      });
+      const caret = document.createElement("i");
+      caret.className = "fx-caret";
+      tl.set(field, { opacity: 1 }, at);
+      steps.forEach((step, i) => {
+        const t = at + (i + 1) / perSecond;
+        tl.set(step, { opacity: 1 }, t);
+        if (i) tl.set(steps[i - 1], { opacity: 0 }, t);
+      });
+      const end = at + text.length / perSecond;
+      const carets = steps.map(step => step.appendChild(caret.cloneNode()));
+      // Leaving the field keeps its text and drops the focus ring and caret.
+      const blur = (when) => tl.to([ring, ...carets], { opacity: 0, duration: 0.15 }, when);
+      return { end, field, steps, blur };
+    }
+
     // Two stacked states of one element; `to` fades over `from` without changing layout.
     function swap(tl, from, to, at, duration = 0.22) {
       tl.to(to, { opacity: 1, duration }, at).to(from, { opacity: 0, duration }, at);
     }
-    return { box, union, focus, move, show, press, highlight, swap, pointer };
+    return { box, union, focus, move, show, press, highlight, swap, type, pointer, card };
   }
 
   // Stack alternative contents in one grid cell so state changes never reflow the page.
@@ -92,7 +142,9 @@
     host.replaceChildren(...contents.map((content, i) => {
       const layer = document.createElement("span");
       layer.className = "fx-layer";
-      if (typeof content === "string") layer.textContent = content; else layer.append(content);
+      if (typeof content === "string") layer.textContent = content;
+      else if (content && typeof content.html === "string") layer.innerHTML = content.html;
+      else layer.append(content);
       layer.style.opacity = i === 0 ? "1" : "0";
       return layer;
     }));

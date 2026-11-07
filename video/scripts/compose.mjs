@@ -34,7 +34,7 @@ const page = (story, device) => {
   #main { position: relative; width: ${width}px; height: ${height}px; overflow: hidden; }
   .stage { position: absolute; inset: 0; }
   [data-cam] { position: absolute; left: 0; top: 0; width: ${inner.width}px; height: ${inner.height}px; will-change: transform; }
-  .frame { position: absolute; inset: 0; display: grid; place-items: center; }
+  .frame { position: absolute; inset: 0; display: grid; justify-items: center; align-items: start; box-sizing: border-box; }
   .frame .demo-app { width: ${cardWidth}px; }
   [data-fx] { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
   [data-fx] > * { position: absolute; left: 0; top: 0; }
@@ -45,8 +45,16 @@ const page = (story, device) => {
   .fx-pointer { width: 20px; height: 20px; transform-origin: 5px 3px; filter: drop-shadow(0 2px 3px #0f1d2e40); }
   .fx-pointer svg { display: block; width: 100%; height: 100%; fill: #1b2b40; stroke: #fff; stroke-width: 1.6; stroke-linejoin: round; }
   .fx-touch { width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; background: #1b2b4026; border: 2px solid #ffffffd9; box-shadow: 0 2px 8px #0f1d2e33; }
-  .fx-ripple { width: 46px; height: 46px; border-radius: 50%; background: var(--blue, #3455db); }
-  .fx-ring { border: 2px solid #3455db; border-radius: 8px; box-shadow: 0 0 0 4px #3455db1f; }
+  .fx-ripple { width: 46px; height: 46px; border-radius: 50%; background: var(--demo-accent); }
+  .fx-field { display: grid; align-items: center; box-sizing: border-box; background: #fff; border: 1px solid; }
+  .fx-focus { position: absolute; inset: -1px; border: 1px solid var(--demo-accent); border-radius: inherit; box-shadow: 0 0 0 3px color-mix(in srgb, var(--demo-accent) 14%, transparent); }
+  .fx-typed { grid-area: 1 / 1; white-space: pre; }
+  .fx-caret { display: inline-block; width: 1px; height: 1.15em; margin-left: 1px; vertical-align: -0.2em; background: currentColor; }
+  .fx-grow { overflow: hidden; }
+  .task button.fx-stack { display: grid; }
+  .task button .fx-layer { display: flex; align-items: center; justify-content: space-between; gap: 5px; }
+  .task button .fx-done { color: #49755c; }
+  .fx-ring { border: 2px solid var(--demo-accent); border-radius: 8px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--demo-accent) 12%, transparent); }
 </style>
 </head>
 <body>

@@ -57,7 +57,7 @@ Live chat: `/chat/` uses `/api/chat`, with server-only credentials, persistent R
 
 - Streaming public chat with the backend-reported model, safe Markdown, code/table formatting, Copy, Stop and Retry.
 - Public catalog comparisons and system recommendations; use a reply in a reviewable local project brief.
-- Eight small, local MP4 recordings of fictional HRMS, FlowTrack, Wedding Planner and Creative Workspace demos, with separate desktop/phone versions and still posters. The HRMS pair is rendered from code with HyperFrames (see `video/README.md`): a cursor or tap indicator, camera push-in, and chapter buttons that seek to the scripted moments. Autoplay is muted and inline; playback pauses offscreen, during dialogs, in hidden tabs, on global pause, and for reduced-motion preferences.
+- Eight small, local MP4 recordings of fictional HRMS, FlowTrack, Wedding Planner and Creative Workspace demos, with separate desktop/phone versions and still posters. All four pairs are rendered from code with HyperFrames (see `video/README.md`): a cursor or tap indicator, camera push-in, and chapter buttons that seek to the scripted moments. Autoplay is muted and inline; playback pauses offscreen, during dialogs, in hidden tabs, on global pause, and for reduced-motion preferences.
 - Project-stage labels in the directory and detail pages, plus a dedicated Games showcase for Tiny Tots and Openworld.
 - No installable workspace, service worker, or stored conversation history is added.
 

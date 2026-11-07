@@ -6,8 +6,8 @@ Rendering uses [HyperFrames](https://github.com/heygen-com/hyperframes) (Apache-
 
 ## How it works
 
-- `stories/` has one file per product. A story takes its markup from the site's own `lib/demo-views.js`, so the recording always matches the live demo, and scripts the cursor, taps, camera and state changes on a seekable timeline.
-- `lib/runtime.js` has the browser-side helpers: measuring targets, camera push-in, pointer and touch indicators, highlight rings and stacked state swaps that never reflow the layout.
+- `stories/` has one file per product (HRMS, FlowTrack, Wedding Planner, Creative Workspace). A story takes its markup from the site's own `lib/demo-views.js`, so the recording always matches the live demo, and scripts the cursor, taps, camera and state changes on a seekable timeline.
+- `lib/runtime.js` has the browser-side helpers: measuring targets, camera push-in and panning, pointer and touch indicators, typing into fields, highlight rings and stacked state swaps that never reflow the layout.
 - `lib/devices.mjs` sets the output sizes: desktop is 1440×960 (1.5× density for retina laptops) and mobile is 390×740.
 - `scripts/compose.mjs` writes one HyperFrames project per story and device into `compositions/` (generated and git-ignored).
 - `scripts/render.mjs` renders each project, re-encodes it as muted, fast-start H.264, and writes the first frame as the poster. The last frame matches the first, so the loop has no seam.
@@ -31,7 +31,7 @@ To check frames before a full render, run `npx hyperframes snapshot compositions
 ## Adding a product
 
 1. Copy `stories/people.mjs`, change `id`, `markup` and the timeline script, and list the story in `stories/index.mjs`.
-2. Add the chapter start times to that product's entry in `../lib/walkthroughs.js` as `times`. A test keeps the HRMS times and the story in sync. Copy that test for each new story.
-3. Run `npm run render`, then `npm test` from the repository root. The recordings are kept to under 160 KB each and 600 KB in total.
+2. Add the chapter titles and start times to that product's entry in `../lib/walkthroughs.js`. A test fails if they drift from the story.
+3. Run `npm run render`, then `npm test` from the repository root. Each MP4 must stay under 200 KB and each desktop/phone pair under 300 KB (only the selected pair is ever downloaded).
 
 HyperFrames ships agent skills (`npx hyperframes skills update`). Installing them is optional and is a step for whoever maintains this folder.
