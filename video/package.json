@@ -1,0 +1,19 @@
+{
+  "name": "ai-nonymauz-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Offline HyperFrames source for the site's product walkthrough recordings. Nothing here ships to visitors.",
+  "type": "module",
+  "scripts": {
+    "compose": "node scripts/compose.mjs",
+    "check": "node scripts/compose.mjs && node scripts/check.mjs",
+    "render": "node scripts/compose.mjs && node scripts/render.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "gsap": "3.15.1",
+    "hyperframes": "0.9.19"
+  }
+}

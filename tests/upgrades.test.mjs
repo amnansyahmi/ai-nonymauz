@@ -7,7 +7,7 @@ import { readSSE } from '../server/sse.js';
 import { renderMarkdown } from '../lib/markdown.js';
 import { initialiseChat } from '../lib/chat.js';
 import { chatPage } from '../lib/chat-page.js';
-import { walkthroughShowcase, initialiseWalkthroughs } from '../lib/walkthroughs.js';
+import { walkthroughShowcase, initialiseWalkthroughs, walkthroughs, chapterStart, chapterAt } from '../lib/walkthroughs.js';
 import { readFile, stat } from 'node:fs/promises';
 
 const env = { PUBLIC_CHAT_ENABLED:'true', AI_NONYMAUZ_CHAT_URL:'https://backend.example/v1/chat/completions', AI_NONYMAUZ_API_KEY:'secret', UPSTASH_REDIS_REST_URL:'https://redis.example', UPSTASH_REDIS_REST_TOKEN:'redis-secret', CHAT_IP_HASH_SECRET:'hash-secret', VERCEL:'1' };
@@ -74,7 +74,31 @@ test('walkthrough playback is inline, pauses offscreen and preserves manual paus
  document.querySelector('[data-walkthrough-product="flow"]').click();await tick();assert.ok(videos.every(video=>video.src.includes('/flow-')));
 });
 test('all demo recordings are small local MP4 files and posters exist',async()=>{
- for(const id of ['people','flow','wedding','studio'])for(const kind of ['desktop','mobile']){
-  const p=`assets/walkthroughs/${id}-${kind}.mp4`,data=await readFile(p);assert.ok(data.subarray(0,24).includes(Buffer.from('ftyp')));assert.ok((await stat(p)).size<100000);assert.ok((await stat(`assets/walkthroughs/${id}-${kind}.webp`)).size>1000);
+ // Only the selected product's desktop/phone pair is ever downloaded (preload="none", src set on demand),
+ // so the budget is per file and per pair.
+ for(const id of ['people','flow','wedding','studio']){
+  let pair=0;
+  for(const kind of ['desktop','mobile']){
+   const p=`assets/walkthroughs/${id}-${kind}.mp4`,data=await readFile(p),size=(await stat(p)).size;pair+=size;
+   assert.ok(data.subarray(0,24).includes(Buffer.from('ftyp')));assert.ok(size<200000,`${p} is ${size} bytes`);assert.ok((await stat(`assets/walkthroughs/${id}-${kind}.webp`)).size>1000);
+  }
+  assert.ok(pair<300000,`${id} recordings total ${pair} bytes`);
  }
+ const html=walkthroughShowcase();
+ assert.equal((html.match(/preload="none"/g)||[]).length,2);assert.ok(!/<video[^>]*\ssrc=/.test(html),'recordings load only when played');
+});
+test('chapter buttons seek to the rendered story chapter times',async()=>{
+ const {stories}=await import('../video/stories/index.mjs');
+ assert.deepEqual(stories.map(s=>s.id),walkthroughs.map(w=>w.id),'every walkthrough has a rendered story');
+ for(const story of stories){
+  const entry=walkthroughs.find(x=>x.id===story.id);
+  assert.deepEqual(entry.chapters,story.chapters.map(c=>c.title),story.id);
+  assert.deepEqual(entry.times,story.chapters.map(c=>c.start),story.id);
+  for(const [i,c] of story.chapters.entries()){
+   assert.equal(chapterStart(entry,i,story.duration),c.start);
+   assert.equal(chapterAt(entry,c.start+0.01,story.duration),i);
+  }
+ }
+ const even={chapters:['a','b','c']};
+ assert.equal(chapterStart(even,2,6),4);assert.equal(chapterAt(even,3.9,6),1);assert.equal(chapterAt(even,1,NaN),0);
 });
